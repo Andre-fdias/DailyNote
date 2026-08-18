@@ -1,0 +1,3 @@
+allprojects {
+    buildDir = new File("C:/temp/DailyNotesBuild/${project.name}")
+}
