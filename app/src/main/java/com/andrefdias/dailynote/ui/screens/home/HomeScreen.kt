@@ -168,6 +168,22 @@ fun HomeScreen(
                 taskToView?.let { homeViewModel.deleteTarefa(it.id) }
                 eventToView = null
                 taskToView = null
+            },
+            onSaveTarefa = { id, titulo, data, hora, descricao, cor, subtarefas ->
+                taskToView?.let { existing ->
+                    homeViewModel.updateTarefa(existing.copy(
+                        titulo = titulo, data = data, hora = hora.ifBlank { null }, 
+                        descricao = descricao, cor = cor, checklist = subtarefas
+                    ))
+                }
+            },
+            onSaveEvento = { id, titulo, data, hora, local, descricao, cor ->
+                eventToView?.let { existing ->
+                    homeViewModel.updateEvento(existing.copy(
+                        titulo = titulo, data = data, hora = hora.ifBlank { null },
+                        local = local, descricao = descricao, cor = cor
+                    ))
+                }
             }
         )
     }

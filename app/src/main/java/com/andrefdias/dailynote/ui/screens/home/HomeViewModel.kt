@@ -193,7 +193,7 @@ class HomeViewModel @Inject constructor(
                     responsavel = null,
                     escalaId = escalaId,
                     checklist = subtarefas.map { 
-                        ChecklistItem(id = it.id, titulo = it.titulo, concluido = it.concluida)
+                        ChecklistItem(id = it.id, titulo = it.titulo, concluido = it.concluida, level = it.level)
                     }
                 )
             )

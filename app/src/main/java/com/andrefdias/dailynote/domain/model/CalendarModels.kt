@@ -65,7 +65,8 @@ enum class StatusTarefa {
 data class ChecklistItem(
     val id: String,
     val titulo: String,
-    val concluido: Boolean
+    val concluido: Boolean,
+    val level: Int = 0
 )
 
 data class CalendarTarefa(
@@ -80,7 +81,8 @@ data class CalendarTarefa(
     val responsavel: String?,
     val anexos: List<String> = emptyList(),
     val checklist: List<ChecklistItem> = emptyList(),
-    val escalaId: String? = null
+    val escalaId: String? = null,
+    val cor: String? = null
 )
 
 enum class CategoriaNotificacao {

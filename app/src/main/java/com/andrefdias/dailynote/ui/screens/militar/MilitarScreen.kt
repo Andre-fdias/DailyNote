@@ -15,6 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.andrefdias.dailynote.domain.model.GraduacaoMilitar
 import com.andrefdias.dailynote.domain.model.situacoesMilitar
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.BorderStroke
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,16 +40,27 @@ fun MilitarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cadastro de Militares") }
+                title = { Text("Cadastro de Militares") },
+                actions = {
+                    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    val isPressed by interactionSource.collectIsPressedAsState()
+                    val scale by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isPressed) 0.8f else 1f, label = "scale")
+                    
+                    IconButton(
+                        onClick = {
+                            viewModel.selectMilitar(null)
+                            showDialog = true
+                        },
+                        interactionSource = interactionSource,
+                        modifier = Modifier
+                            .scale(scale)
+                            .size(36.dp)
+                            .background(Color(0xFFFF9800), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Adicionar Militar", tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
+                }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.selectMilitar(null)
-                showDialog = true
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Adicionar Militar")
-            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -51,29 +70,96 @@ fun MilitarScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(militares, key = { it.id }) { militar ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(text = "${militar.graduacao} ${militar.nomeGuerra}", style = MaterialTheme.typography.titleMedium)
-                                Text(text = "RE: ${militar.re}", style = MaterialTheme.typography.bodyMedium)
-                                Text(text = militar.nomeCompleto, style = MaterialTheme.typography.bodySmall)
-                                Text(text = "Situação: ${militar.situacao}", style = MaterialTheme.typography.bodySmall)
-                            }
-                            Row {
-                                IconButton(onClick = {
-                                    viewModel.selectMilitar(militar)
-                                    showDialog = true
-                                }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Editar")
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
+                        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "${militar.graduacao} ${militar.nomeGuerra}", 
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "RE: ${militar.re}", 
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF90A4AE)
+                                    )
+                                    Text(
+                                        text = militar.nomeCompleto, 
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF90A4AE)
+                                    )
                                 }
-                                IconButton(onClick = { viewModel.deleteMilitar(militar) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Excluir")
+                                Row {
+                                    IconButton(onClick = {
+                                        viewModel.selectMilitar(militar)
+                                        showDialog = true
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color(0xFF90A4AE))
+                                    }
+                                    IconButton(onClick = { viewModel.deleteMilitar(militar) }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = Color(0xFFEF5350))
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val situacaoColor = if (militar.situacao == "Pronto") Color(0xFF4CAF50) else Color(0xFFEF5350)
+                                Box(
+                                    modifier = Modifier
+                                        .background(situacaoColor.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = militar.situacao,
+                                        color = situacaoColor,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                
+                                if (militar.mergulhador) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color(0xFF2196F3).copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "Merg",
+                                            color = Color(0xFF2196F3),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+
+                                if (militar.ovb != "Não Habilitado" && militar.ovb.isNotBlank()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(Color(0xFFFF9800).copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "OVB ${militar.ovb}",
+                                            color = Color(0xFFFF9800),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                         }

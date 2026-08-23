@@ -56,6 +56,12 @@ abstract class AppModule {
         equipeServicoRepositoryImpl: com.andrefdias.dailynote.data.repository.EquipeServicoRepositoryImpl
     ): com.andrefdias.dailynote.domain.repository.EquipeServicoRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindOcorrenciaRepository(
+        ocorrenciaRepositoryImpl: com.andrefdias.dailynote.data.repository.OcorrenciaRepositoryImpl
+    ): com.andrefdias.dailynote.domain.repository.OcorrenciaRepository
+
     companion object {
         private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore(name = "dailynote_settings")
 
@@ -99,6 +105,27 @@ abstract class AppModule {
         @Singleton
         fun provideEquipeServicoDao(database: AppDatabase): com.andrefdias.dailynote.data.local.dao.EquipeServicoDao {
             return database.equipeServicoDao()
+        }
+
+        @Provides
+        @Singleton
+        fun provideRetrofit(): retrofit2.Retrofit {
+            val client = okhttp3.OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build()
+
+            return retrofit2.Retrofit.Builder()
+                .baseUrl("https://script.google.com/macros/s/AKfycbwPmnIFCM284-fZiiL782feoSSFqauEpmNtM308fyoLvwCppuS7p-GpYicWUwH61sw1gg/")
+                .client(client)
+                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+                .build()
+        }
+
+        @Provides
+        @Singleton
+        fun provideOcorrenciasApi(retrofit: retrofit2.Retrofit): com.andrefdias.dailynote.data.remote.OcorrenciasApi {
+            return retrofit.create(com.andrefdias.dailynote.data.remote.OcorrenciasApi::class.java)
         }
     }
 }

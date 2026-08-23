@@ -25,6 +25,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.Instant
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,11 +159,6 @@ fun EquipeServicoScreen(
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showCadastroBottomSheet = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Cadastros Auxiliares")
-            }
         }
     ) { padding ->
         
@@ -190,9 +190,14 @@ fun EquipeServicoScreen(
         ) {
             // CABEÇALHO
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
+                    border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Configuração Diária", style = MaterialTheme.typography.titleMedium)
+                        Text("Configuração Diária", style = MaterialTheme.typography.titleMedium, color = Color.White)
                         
                         OutlinedTextField(
                             value = displayData,
@@ -314,7 +319,7 @@ fun EquipeServicoScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Viaturas Empenhadas", style = MaterialTheme.typography.titleMedium)
+                        Text("Viaturas Empenhadas", style = MaterialTheme.typography.titleMedium, color = Color.White)
                         
                         ExposedDropdownMenuBox(
                             expanded = expandedAddViatura,
@@ -437,32 +442,51 @@ fun ViaturaCard(
 ) {
     var showAddMilitar by remember { mutableStateOf(false) }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
+        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = eqViatura.viatura?.prefixo ?: "Viatura Desconhecida",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = onRemoveViatura) {
-                    Icon(Icons.Default.Close, contentDescription = "Remover")
+                    Icon(Icons.Default.Close, contentDescription = "Remover", tint = Color(0xFFEF5350))
                 }
+            }
+
+            if (eqViatura.militaresEscalados.isNotEmpty()) {
+                Divider(color = Color(0xFF37474F), thickness = 0.5.dp)
             }
 
             // Lista de militares
             eqViatura.militaresEscalados.forEach { me ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column {
-                        Text(text = "${me.funcao}: ${me.militar?.graduacao ?: ""} ${me.militar?.nomeGuerra ?: ""}", fontWeight = FontWeight.Bold)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            androidx.compose.foundation.layout.Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(Color(0xFF4CAF50), CircleShape)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = "${me.funcao}: ${me.militar?.graduacao ?: ""} ${me.militar?.nomeGuerra ?: ""}", fontWeight = FontWeight.Bold, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                        }
+                        
                         val details = if (me.tipoEscala == "DEJEM") "DEJEM (${me.dejemHorarioInicio} - ${me.dejemHorarioFim})" else me.tipoEscala
-                        Text(text = details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                        Text(text = details, style = MaterialTheme.typography.bodySmall, color = Color(0xFF90A4AE), modifier = Modifier.padding(start = 16.dp))
                     }
                     IconButton(onClick = {
                         val novaLista = eqViatura.militaresEscalados.filter { it.id != me.id }
                         onUpdateViatura(eqViatura.copy(militaresEscalados = novaLista))
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Remover Militar")
+                        Icon(Icons.Default.Close, contentDescription = "Remover Militar", tint = Color(0xFF90A4AE))
                     }
                 }
             }
@@ -514,9 +538,15 @@ fun MilitarEscaladoForm(
 ) {
     var militarId by remember { mutableStateOf("") }
     var funcao by remember { mutableStateOf("Motorista") }
-    var tipoEscala by remember { mutableStateOf("DEJEM") }
+    var tipoEscala by remember { mutableStateOf("") }
     var dejemHorarioInicio by remember { mutableStateOf("") }
     var dejemHorarioFim by remember { mutableStateOf("") }
+
+    LaunchedEffect(tiposEscala) {
+        if (tipoEscala.isBlank() && tiposEscala.isNotEmpty()) {
+            tipoEscala = tiposEscala.firstOrNull { it != "DEJEM" } ?: tiposEscala.first()
+        }
+    }
 
     var expandedFuncao by remember { mutableStateOf(false) }
     val funcoes = listOf("Comandante", "Motorista", "Auxiliar", "Telegrafista")

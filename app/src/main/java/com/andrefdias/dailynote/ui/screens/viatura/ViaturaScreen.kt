@@ -13,6 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.BorderStroke
 
 val tiposAtendimento = listOf("Resgate", "Incêndio", "Salvamento", "Administrativa")
 
@@ -35,16 +43,27 @@ fun ViaturaScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cadastro de Viaturas") }
+                title = { Text("Cadastro de Viaturas") },
+                actions = {
+                    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    val isPressed by interactionSource.collectIsPressedAsState()
+                    val scale by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isPressed) 0.8f else 1f, label = "scale")
+                    
+                    IconButton(
+                        onClick = {
+                            viewModel.selectViatura(null)
+                            showDialog = true
+                        },
+                        interactionSource = interactionSource,
+                        modifier = Modifier
+                            .scale(scale)
+                            .size(36.dp)
+                            .background(Color(0xFFFF9800), androidx.compose.foundation.shape.CircleShape)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Adicionar Viatura", tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
+                }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.selectViatura(null)
-                showDialog = true
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Adicionar Viatura")
-            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -54,29 +73,68 @@ fun ViaturaScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(viaturas, key = { it.id }) { viatura ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(text = "${viatura.prefixo} (${viatura.tipo})", style = MaterialTheme.typography.titleMedium)
-                                Text(text = "Atendimento: ${viatura.tipoAtendimento}", style = MaterialTheme.typography.bodyMedium)
-                                Text(text = "Local: ${viatura.unidade} - ${viatura.posto}", style = MaterialTheme.typography.bodyMedium)
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
+                        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "${viatura.prefixo} (${viatura.tipo})", 
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "Atendimento: ${viatura.tipoAtendimento}", 
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF90A4AE)
+                                    )
+                                    Text(
+                                        text = "Local: ${viatura.unidade} - ${viatura.posto}", 
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF90A4AE)
+                                    )
+                                }
+                                Row {
+                                    IconButton(onClick = {
+                                        viewModel.selectViatura(viatura)
+                                        showDialog = true
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color(0xFF90A4AE))
+                                    }
+                                    IconButton(onClick = { viewModel.deleteViatura(viatura) }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = Color(0xFFEF5350))
+                                    }
+                                }
                             }
-                            Row {
-                                IconButton(onClick = {
-                                    viewModel.selectViatura(viatura)
-                                    showDialog = true
-                                }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Editar")
-                                }
-                                IconButton(onClick = { viewModel.deleteViatura(viatura) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Excluir")
-                                }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            val statusColor = when(viatura.status) {
+                                "Operacional" -> Color(0xFF4CAF50)
+                                "Manutenção", "Baixada" -> Color(0xFFEF5350)
+                                "Em ocorrência" -> Color(0xFFFF9800)
+                                else -> Color(0xFF90A4AE)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .background(statusColor.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = viatura.status,
+                                    color = statusColor,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }

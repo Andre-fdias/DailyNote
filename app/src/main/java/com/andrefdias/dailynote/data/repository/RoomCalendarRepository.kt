@@ -16,7 +16,8 @@ import javax.inject.Singleton
 private data class ChecklistItemDto(
     val id: String,
     val titulo: String,
-    val concluido: Boolean
+    val concluido: Boolean,
+    val level: Int = 0
 )
 
 @Singleton
@@ -307,7 +308,7 @@ class RoomCalendarRepository @Inject constructor(
     // --- Tarefas ---
     override suspend fun saveTarefa(tarefa: CalendarTarefa): Result<Unit> = runCatching {
         val checklistJsonStr = json.encodeToString(
-            tarefa.checklist.map { ChecklistItemDto(it.id, it.titulo, it.concluido) }
+            tarefa.checklist.map { ChecklistItemDto(it.id, it.titulo, it.concluido, it.level) }
         )
         val anexosStr = if (tarefa.anexos.isEmpty()) null else tarefa.anexos.joinToString(",")
 
@@ -340,7 +341,7 @@ class RoomCalendarRepository @Inject constructor(
             } else {
                 runCatching {
                     json.decodeFromString<List<ChecklistItemDto>>(it.checklistJson).map { dto ->
-                        ChecklistItem(dto.id, dto.titulo, dto.concluido)
+                        ChecklistItem(dto.id, dto.titulo, dto.concluido, dto.level)
                     }
                 }.getOrDefault(emptyList())
             }
@@ -371,7 +372,7 @@ class RoomCalendarRepository @Inject constructor(
                 } else {
                     runCatching {
                         json.decodeFromString<List<ChecklistItemDto>>(it.checklistJson).map { dto ->
-                            ChecklistItem(dto.id, dto.titulo, dto.concluido)
+                            ChecklistItem(dto.id, dto.titulo, dto.concluido, dto.level)
                         }
                     }.getOrDefault(emptyList())
                 }
@@ -401,7 +402,7 @@ class RoomCalendarRepository @Inject constructor(
             } else {
                 runCatching {
                     json.decodeFromString<List<ChecklistItemDto>>(it.checklistJson).map { dto ->
-                        ChecklistItem(dto.id, dto.titulo, dto.concluido)
+                        ChecklistItem(dto.id, dto.titulo, dto.concluido, dto.level)
                     }
                 }.getOrDefault(emptyList())
             }
@@ -432,7 +433,7 @@ class RoomCalendarRepository @Inject constructor(
                 } else {
                     runCatching {
                         json.decodeFromString<List<ChecklistItemDto>>(it.checklistJson).map { dto ->
-                            ChecklistItem(dto.id, dto.titulo, dto.concluido)
+                            ChecklistItem(dto.id, dto.titulo, dto.concluido, dto.level)
                         }
                     }.getOrDefault(emptyList())
                 }
@@ -462,7 +463,7 @@ class RoomCalendarRepository @Inject constructor(
             } else {
                 runCatching {
                     json.decodeFromString<List<ChecklistItemDto>>(it.checklistJson).map { dto ->
-                        ChecklistItem(dto.id, dto.titulo, dto.concluido)
+                        ChecklistItem(dto.id, dto.titulo, dto.concluido, dto.level)
                     }
                 }.getOrDefault(emptyList())
             }

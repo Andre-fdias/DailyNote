@@ -26,6 +26,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,8 +45,7 @@ fun ResumoOperacionalScreen(
     onNavigateToEquipe: () -> Unit = {}
 ) {
     val equipes by viewModel.equipesHistorico.collectAsState()
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val tabs = listOf("Visão do Dia", "Visão Geral")
+
 
     Scaffold(
         topBar = {
@@ -56,83 +56,41 @@ fun ResumoOperacionalScreen(
                 )
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onNavigateToEquipe,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Nova Equipe")
-            }
-        }
+
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            TabRow(selectedTabIndex = selectedTabIndex) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(title) }
-                    )
+            val now = java.time.LocalDateTime.now()
+            val todayStr = now.toLocalDate().toString()
+            
+            val activeShifts = equipes.filter { equipe ->
+                val dataStr = equipe.data
+                val horaInicio = equipe.equipeConfig?.horaInicio ?: "00:00"
+                try {
+                    val parts = horaInicio.split(":")
+                    val hour = parts[0].toIntOrNull() ?: 0
+                    val min = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                    val startDateTime = java.time.LocalDate.parse(dataStr).atTime(hour, min)
+                    val endDateTime = startDateTime.plusHours(24)
+                    now.isAfter(startDateTime.minusMinutes(1)) && now.isBefore(endDateTime)
+                } catch (e: Exception) {
+                    dataStr == todayStr
                 }
             }
-
-            if (selectedTabIndex == 0) {
-                val now = java.time.LocalDateTime.now()
-                val todayStr = now.toLocalDate().toString()
-                
-                val activeShifts = equipes.filter { equipe ->
-                    val dataStr = equipe.data
-                    val horaInicio = equipe.equipeConfig?.horaInicio ?: "00:00"
-                    try {
-                        val parts = horaInicio.split(":")
-                        val hour = parts[0].toIntOrNull() ?: 0
-                        val min = parts.getOrNull(1)?.toIntOrNull() ?: 0
-                        val startDateTime = java.time.LocalDate.parse(dataStr).atTime(hour, min)
-                        val endDateTime = startDateTime.plusHours(24)
-                        now.isAfter(startDateTime.minusMinutes(1)) && now.isBefore(endDateTime)
-                    } catch (e: Exception) {
-                        dataStr == todayStr
-                    }
-                }
-                
-                val equipesDoDia = activeShifts.ifEmpty { equipes.filter { it.data == todayStr } }
-                
-                if (equipesDoDia.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Nenhuma equipe cadastrada para hoje.", color = Color.Gray)
-                    }
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(equipesDoDia, key = { it.id }) { equipe ->
-                            DashboardViaturaCard(equipe, onNavigateToEquipe)
-                        }
-                    }
+            
+            val equipesDoDia = activeShifts.ifEmpty { equipes.filter { it.data == todayStr } }
+            
+            if (equipesDoDia.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Nenhuma equipe cadastrada para hoje.", color = Color.Gray)
                 }
             } else {
-                val viaturasEscaladas = remember(equipes) {
-                    equipes.flatMap { equipe -> 
-                        equipe.viaturas.map { viatura -> Pair(equipe, viatura) }
-                    }.sortedByDescending { it.first.data }
-                }
-
-                if (viaturasEscaladas.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Nenhuma viatura escalada.", color = Color.Gray)
-                    }
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(viaturasEscaladas, key = { it.second.id }) { (equipe, viatura) ->
-                            ResumoViaturaCard(equipe, viatura)
-                        }
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 0.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(equipesDoDia, key = { it.id }) { equipe ->
+                        DashboardViaturaCard(equipe, onNavigateToEquipe)
                     }
                 }
             }
@@ -209,14 +167,27 @@ fun DashboardViaturaCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "${equipe.unidade.uppercase()} / ${equipe.posto.uppercase()}", 
-                        color = Color.White, 
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${equipe.unidade.uppercase()} / ${equipe.posto.uppercase()}", 
+                            color = Color.White, 
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = equipe.data,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
                     Spacer(modifier = Modifier.height(6.dp))
                     
                     Row(
@@ -462,11 +433,44 @@ fun DashboardViaturaCard(
                 if (bottomSheetPms.isEmpty()) {
                     Text("Nenhum militar encontrado.", color = Color.Gray)
                 } else {
-                    bottomSheetPms.forEach { me ->
+                    val sortedPms = bottomSheetPms.sortedByDescending { me -> 
+                        var isAtivo = true
+                        if (me.tipoEscala == "DEJEM" && me.dejemHorarioFim != null) {
+                            try {
+                                val dateParse = java.time.LocalDate.parse(equipe.data)
+                                val today = java.time.LocalDate.now()
+                                if (dateParse.isBefore(today)) isAtivo = false
+                                else if (dateParse.isEqual(today)) {
+                                    val timeEnd = java.time.LocalTime.parse(me.dejemHorarioFim)
+                                    if (java.time.LocalTime.now().isAfter(timeEnd)) isAtivo = false
+                                }
+                            } catch (e: Exception) {
+                                isAtivo = true
+                            }
+                        }
+                        isAtivo
+                    }
+
+                    sortedPms.forEach { me ->
                         val pm = me.militar
                         if (pm != null) {
+                            var isAtivo = true
+                            if (me.tipoEscala == "DEJEM" && me.dejemHorarioFim != null) {
+                                try {
+                                    val dateParse = java.time.LocalDate.parse(equipe.data)
+                                    val today = java.time.LocalDate.now()
+                                    if (dateParse.isBefore(today)) isAtivo = false
+                                    else if (dateParse.isEqual(today)) {
+                                        val timeEnd = java.time.LocalTime.parse(me.dejemHorarioFim)
+                                        if (java.time.LocalTime.now().isAfter(timeEnd)) isAtivo = false
+                                    }
+                                } catch (e: Exception) {}
+                            }
+                            
+                            val alphaValue = if (isAtivo) 1f else 0.4f
+
                             Card(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).let { if(!isAtivo) it.background(Color.Transparent) else it }.graphicsLayer { alpha = alphaValue },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
                                 border = androidx.compose.foundation.BorderStroke(0.5.dp, Color(0xFF37474F))

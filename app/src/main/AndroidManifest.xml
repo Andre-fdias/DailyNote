@@ -32,6 +32,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- Chave do Google Maps (Necessário para não fechar o app) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSy_DUMMY_KEY_COLOQUE_A_CHAVE_REAL_AQUI" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
