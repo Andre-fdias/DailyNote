@@ -109,16 +109,41 @@ abstract class AppModule {
 
         @Provides
         @Singleton
+        fun provideConfiguracaoDao(database: AppDatabase): com.andrefdias.dailynote.data.local.dao.ConfiguracaoDao {
+            return database.configuracaoDao()
+        }
+
+        @Provides
+        @Singleton
         fun provideRetrofit(): retrofit2.Retrofit {
             val client = okhttp3.OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .build()
 
+            val gson = com.google.gson.GsonBuilder()
+                .registerTypeAdapter(Int::class.java, com.google.gson.JsonDeserializer<Int> { json, _, _ ->
+                    val str = json.asString
+                    if (str.isNullOrBlank()) 0 else try { str.toInt() } catch (e: Exception) { 0 }
+                })
+                .registerTypeAdapter(Double::class.java, com.google.gson.JsonDeserializer<Double> { json, _, _ ->
+                    val str = json.asString
+                    if (str.isNullOrBlank()) null else try { str.toDouble() } catch (e: Exception) { null }
+                })
+                .registerTypeAdapter(Integer::class.java, com.google.gson.JsonDeserializer<Int> { json, _, _ ->
+                    val str = json.asString
+                    if (str.isNullOrBlank()) 0 else try { str.toInt() } catch (e: Exception) { 0 }
+                })
+                .registerTypeAdapter(java.lang.Double::class.java, com.google.gson.JsonDeserializer<Double> { json, _, _ ->
+                    val str = json.asString
+                    if (str.isNullOrBlank()) null else try { str.toDouble() } catch (e: Exception) { null }
+                })
+                .create()
+
             return retrofit2.Retrofit.Builder()
                 .baseUrl("https://script.google.com/macros/s/AKfycbwPmnIFCM284-fZiiL782feoSSFqauEpmNtM308fyoLvwCppuS7p-GpYicWUwH61sw1gg/")
                 .client(client)
-                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create(gson))
                 .build()
         }
 

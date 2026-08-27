@@ -29,7 +29,7 @@ fun FireCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 2.dp,
     shape: RoundedCornerShape = FireShapes.Medium,
-    containerColor: Color = FireColors.Surface,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     contentPadding: PaddingValues = PaddingValues(FireSpacing.Medium),
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -249,7 +249,7 @@ fun FireDashboardCard(
             Text(text = value, style = FireTypography.Headline)
             if (description != null) {
                 Spacer(modifier = Modifier.height(FireSpacing.ExtraSmall))
-                Text(text = description, style = FireTypography.Caption, color = Color.Gray)
+                Text(text = description, style = FireTypography.Caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -287,8 +287,8 @@ fun FireOccurrenceCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Talão: $protocolo", style = FireTypography.Title)
-                    Text(text = dataHora, style = FireTypography.Label, color = Color.Gray)
+                    Text(text = "Talão: $protocolo", style = FireTypography.Title, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = dataHora, style = FireTypography.Label, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(FireSpacing.Small),
@@ -302,7 +302,7 @@ fun FireOccurrenceCard(
                         Text(text = natureza, style = FireTypography.Caption, color = natureColor)
                     }
                     if (!cidade.isNullOrBlank()) {
-                        Text(text = "📍 $cidade", style = FireTypography.Body, color = Color.DarkGray)
+                        Text(text = "📍 $cidade", style = FireTypography.Body, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -310,7 +310,7 @@ fun FireOccurrenceCard(
                 Icon(
                     imageVector = FireIcons.ChevronRight,
                     contentDescription = "Detalhes",
-                    tint = Color.Gray,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(end = FireSpacing.Small)
                 )
             }
@@ -343,10 +343,10 @@ fun FireVehicleCard(
                 Text(text = "Veículo: $marcaModelo", style = FireTypography.Body)
             }
             if (!proprietario.isNullOrBlank()) {
-                Text(text = "Proprietário: $proprietario", style = FireTypography.Label, color = Color.Gray)
+                Text(text = "Proprietário: $proprietario", style = FireTypography.Label, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (!condutor.isNullOrBlank()) {
-                Text(text = "Condutor: $condutor", style = FireTypography.Label, color = Color.Gray)
+                Text(text = "Condutor: $condutor", style = FireTypography.Label, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -380,7 +380,7 @@ fun FireVictimCard(
                 Text(text = "Gravidade: $severidade", style = FireTypography.Label, color = FireColor.Primary)
             }
             if (!sinaisVitais.isNullOrBlank()) {
-                Text(text = "Sinais: $sinaisVitais", style = FireTypography.Caption, color = Color.Gray)
+                Text(text = "Sinais: $sinaisVitais", style = FireTypography.Caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -410,7 +410,7 @@ fun FireDocumentCard(
                 Text(text = "Nº: $numero", style = FireTypography.Body)
             }
             if (!nomePessoa.isNullOrBlank()) {
-                Text(text = "Nome: $nomePessoa", style = FireTypography.Label, color = Color.Gray)
+                Text(text = "Nome: $nomePessoa", style = FireTypography.Label, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -438,7 +438,7 @@ fun FireMilitaryCard(
             }
             Text(text = "RE: $re", style = FireTypography.Body)
             if (!funcao.isNullOrBlank()) {
-                Text(text = "Função: $funcao", style = FireTypography.Label, color = Color.Gray)
+                Text(text = "Função: $funcao", style = FireTypography.Label, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -517,7 +517,7 @@ fun FireAttachmentCard(
                 Spacer(modifier = Modifier.width(FireSpacing.Small))
                 Column {
                     Text(text = fileName, style = FireTypography.Title)
-                    Text(text = fileType, style = FireTypography.Caption, color = Color.Gray)
+                    Text(text = fileType, style = FireTypography.Caption, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (onDelete != null) {

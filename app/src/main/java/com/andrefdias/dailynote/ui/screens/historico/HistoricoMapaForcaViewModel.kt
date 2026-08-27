@@ -36,7 +36,7 @@ class HistoricoMapaForcaViewModel @Inject constructor(
         carregarEquipes()
     }
 
-    private fun carregarEquipes() {
+    fun carregarEquipes() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             
@@ -91,5 +91,17 @@ class HistoricoMapaForcaViewModel @Inject constructor(
             matchData || matchUnidade || matchPosto || matchViatura
         }
         _state.value = _state.value.copy(equipesFiltradas = filtradas)
+    }
+
+    fun exportToPdf(context: android.content.Context) {
+        com.andrefdias.dailynote.util.ExportUtils.exportEquipesToPdfAndShare(context, _state.value.equipesFiltradas)
+    }
+
+    fun exportToExcel(context: android.content.Context) {
+        com.andrefdias.dailynote.util.ExportUtils.exportEquipesToExcelAndShare(context, _state.value.equipesFiltradas)
+    }
+
+    fun shareAsJson(context: android.content.Context) {
+        com.andrefdias.dailynote.util.ExportUtils.exportEquipesToJsonAndShare(context, _state.value.equipesFiltradas)
     }
 }

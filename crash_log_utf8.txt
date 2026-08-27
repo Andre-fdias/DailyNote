@@ -1,0 +1,500 @@
+﻿08-23 06:40:24.215  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.215  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.248  1203 18819 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118690054ms ago.
+08-23 06:40:24.258  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.259  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.259  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.288  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.288  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.288  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.289  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.292  1203 18484 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118693040ms ago.
+08-23 06:40:24.308  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-40, periodicAdvInt=0x0
+08-23 06:40:24.332  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.333  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.333  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.361  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.361  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.380  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.380  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.406  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.406  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.406  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.413  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-40, periodicAdvInt=0x0
+08-23 06:40:24.421  1203 18810 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118690059ms ago.
+08-23 06:40:24.434  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.435  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.471  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.471  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.479  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.479  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.479  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.508  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.508  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.514  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:24.552  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.553  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.553  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.561  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.562  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.581  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.582  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.611  1406  1418 E thermal_core: find_tz_idx_by_name:"Failed to find thermal zone index of ap_ntc\n"
+08-23 06:40:24.615  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-47, periodicAdvInt=0x0
+08-23 06:40:24.625  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.626  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.626  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.652  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.653  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.655  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.655  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.699  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.699  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.699  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.719  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-39, periodicAdvInt=0x0
+08-23 06:40:24.728  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.729  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.743  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.744  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.772  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.772  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.773  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.785  1203 18443 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118694041ms ago.
+08-23 06:40:24.802  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.802  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.828  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:24.835  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.835  1203 18910 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118689072ms ago.
+08-23 06:40:24.835  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.846  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.846  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.847  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.848  1837  2279 D WifiConnectivityMonitor.NetworkStatsAnalyzer: Backhaul result - RSSI:-57, CE:26, PE:26, TI:31, PTI:31, TW:0, PTW:0, Tx:7, Rx:5, TxS:0, RxS:0, RESULT:true, IC:1, ICT:5, WC:5, WCT:5, R:0, RC:0, IE:0, EC:0
+08-23 06:40:24.875  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.876  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.920  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.920  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.920  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:24.926  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:24.927  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:24.949  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:24.949  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:24.994  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:24.994  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:24.994  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.018  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.018  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.022  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.022  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.030  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:25.067  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.067  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.067  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.096  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.096  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.109  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.109  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.132  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:25.141  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.141  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.141  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.169  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.170  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.174  1203 18861 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118690047ms ago.
+08-23 06:40:25.174  1203 18588 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118693038ms ago.
+08-23 06:40:25.179  1585  1716 I bauth_FPBAuthService: pcf : 0x1012, 0 ,1 ,0 ,0 ,0 ,0, 16.0.0.0
+08-23 06:40:25.179  1585  1716 I bauth_FPBAuthService: thread id : 1, preenroll_flag : 0, nd cnt : 0, cso : 0, et : 0
+08-23 06:40:25.179  1585  1716 I bauth_FPBAuthService: FPBAuthService::timerHandler complete
+08-23 06:40:25.200  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.200  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.202  1203 18819 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118691008ms ago.
+08-23 06:40:25.214  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.214  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.215  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.241  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-39, periodicAdvInt=0x0
+08-23 06:40:25.243  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.243  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.287  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.288  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.288  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.291  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.291  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.316  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.316  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.321  1203 18484 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118694069ms ago.
+08-23 06:40:25.343  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-40, periodicAdvInt=0x0
+08-23 06:40:25.352   592   592 D io_stats: !@   8,32 r 48408711 1210605648 w 11774853 244624960 d 2837912 388726612 f 48964 179692 iot 13250476 0 th 0 0 0 pt 0 inp 0 0 592794.941
+08-23 06:40:25.361  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.361  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.361  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.381  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.382  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.390  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.390  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.423  1203 18810 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118691061ms ago.
+08-23 06:40:25.434  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.435  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.435  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.443  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-40, periodicAdvInt=0x0
+08-23 06:40:25.463  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.463  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.473  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.473  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.508  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.508  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.508  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.537  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.537  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.564  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.564  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.581  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.581  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.582  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.611  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.611  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.612  1406  1418 E thermal_core: find_tz_idx_by_name:"Failed to find thermal zone index of ap_ntc\n"
+08-23 06:40:25.650  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0
+08-23 06:40:25.655  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.655  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.655  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.655  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.655  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.684  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.684  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.728  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.728  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.728  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.746  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.746  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.754  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-50, periodicAdvInt=0x0
+08-23 06:40:25.757  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.758  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.787  1203 18443 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118695043ms ago.
+08-23 06:40:25.791  1203 18910 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118690028ms ago.
+08-23 06:40:25.801  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.802  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.802  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.831  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.831  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.837  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.837  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.863  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-50, periodicAdvInt=0x0
+08-23 06:40:25.875  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.875  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.875  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.904  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.905  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:25.928  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:25.928  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:25.936  1837  4002 D SemWifiUsabilityStatsMonitor: onWifiUsabilityStats - seqNum 102443, isSameBssidAndFreq true
+08-23 06:40:25.939  1837  2250 I SemWifiLinkQualityMonitor: Link stat: 0 / 0 / 1,00 (4) / 351 / -60.0 || 100.0 : 351,00 / 0.5 : 1,00 / 0.55 : 0,30 / G (G) || 48598cc25220: 0,126 / 63,669 / D / V || N N / 0 0 / Y 2.0 / Y -1 0.000 0.000 / Y / X 0 / 592795527 0 0 || Invalid
+08-23 06:40:25.948  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:25.949  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:25.949  1258  1501 I SurfaceFlinger: Current= 90, Period= 90, hwcPeriod= 90
+08-23 06:40:25.949  1258  1501 I SurfaceFlinger: Current= 90, Period= 90, Distance= 0
+08-23 06:40:25.949  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:25.953  1258  1258 I BufferQueueProducer: [StatusBar$_2952#87](this:0xb400007430df7eb0,id:-1,api:0,p:-1,c:1258) queueBuffer: fps=0.33 dur=2987.52 max=2987.52 min=2987.52
+08-23 06:40:25.957  1197  1221 I hwcomposer: [HWCDisplay] (0 updateFps():4131), (type:1, mode:2) fps:0.670085,dur:2984.70,max:2895.19,min:89.51  
+08-23 06:40:25.960  1258  1501 I SurfaceFlinger: Current= 90, Period= 90, hwcPeriod= 90
+08-23 06:40:25.960  1258  1501 I SurfaceFlinger: Current= 90, Period= 90, Distance= 90
+08-23 06:40:25.969  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-50, periodicAdvInt=0x0
+08-23 06:40:25.978  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:25.978  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.019  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.019  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.022  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.023  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.023  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.032  2336  2372 D SatelliteController: isInCarrierRoamingNbIotNtn: satellite is disabled
+08-23 06:40:26.033  2336  2372 D SatelliteController: getCarrierRoamingNtnConnectType: Falling back to global carrier config connect type: 0
+08-23 06:40:26.035  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1)
+08-23 06:40:26.035  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1) lastNotifiedSignalStrength level: 0
+08-23 06:40:26.035  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1) currSignalStrength level: 0
+08-23 06:40:26.040  2401  2401 I EPDG-0 [CellularProfiler]: onSignalStrengthsChanged: SignalStrength:{mCdma=Invalid,mGsm=Invalid,mWcdma=Invalid,mTdscdma=Invalid,mLte=CellSignalStrengthLte: rssi=-107 rsrp=-106 rsrq=-7 rssnr=9 cqiTableIndex=2147483647 cqi=2147483647 ta=2147483647 level=3 parametersUseForLevel=0,mNr=Invalid,SignalBarInfo{ lteLevel=2 },rat=14,primary=CellSignalStrengthLte}
+08-23 06:40:26.040  2401  2835 I EPDG-0 [CellularProfiler]: lastLteRSRP is -108 currentLteRSRP is -106 lastLteRSRQ is -10 currentLteRSRQ is -7 lastLteSNR is 9 currentLteSNR is 9
+08-23 06:40:26.040  2401  2835 I EPDG-0 [LogMetrics]: set, type=LTE_RSRP_LAST, value=-106
+08-23 06:40:26.052  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.052  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.059  1197  1413 I hwcomposer: [HWC] (0)fire a callback of refresh to SF[4]  
+08-23 06:40:26.077  1258  1258 I BufferQueueProducer: [FramebufferSurface](this:0xb40000745fa7fd78,id:-1,api:1,p:1258,c:1258) queueBuffer: fps=0.33 dur=3016.60 max=3016.60 min=3016.60
+08-23 06:40:26.078  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:26.095  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.096  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.096  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.110  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.111  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.125  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.125  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.129  1203 18861 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118691003ms ago.
+08-23 06:40:26.169  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.169  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.170  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.180  1585  1716 I bauth_FPBAuthService: pcf : 0x1012, 0 ,1 ,0 ,0 ,0 ,0, 16.0.0.0
+08-23 06:40:26.180  1585  1716 I bauth_FPBAuthService: thread id : 1, preenroll_flag : 0, nd cnt : 0, cso : 0, et : 0
+08-23 06:40:26.180  1585  1716 I bauth_FPBAuthService: FPBAuthService::timerHandler complete
+08-23 06:40:26.199  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.199  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.202  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.202  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.203  1203 18588 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118694067ms ago.
+08-23 06:40:26.232  1203 18819 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118692038ms ago.
+08-23 06:40:26.243  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.243  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.243  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.272  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.273  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.276  1203 18484 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118695025ms ago.
+08-23 06:40:26.288  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0
+08-23 06:40:26.292  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.293  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.316  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.317  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.317  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.346  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.346  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.384  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.384  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.390  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.390  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.390  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.396  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0
+08-23 06:40:26.420  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.420  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.425  1203 18810 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118692063ms ago.
+08-23 06:40:26.463  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.464  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.464  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.475  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.475  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.493  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.494  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.497  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-43, periodicAdvInt=0x0
+08-23 06:40:26.537  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.537  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.537  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.566  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.566  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.566  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.567  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.608  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-46, periodicAdvInt=0x0
+08-23 06:40:26.610  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.611  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.611  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.613  1406  1418 E thermal_core: find_tz_idx_by_name:"Failed to find thermal zone index of ap_ntc\n"
+08-23 06:40:26.640  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.640  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.657  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.657  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.684  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.684  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.685  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.709  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:26.713  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.714  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.748  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.748  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.757  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.757  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.758  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.787  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.788  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.790  1203 18443 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118696045ms ago.
+08-23 06:40:26.813  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:26.820  1203 18910 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118691057ms ago.
+08-23 06:40:26.830  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.831  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.832  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.839  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.840  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.860  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.861  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.904  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.904  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.905  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:26.930  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:26.931  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:26.934  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:26.935  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:26.977  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:26.977  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:26.978  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.008  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.008  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.022  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.022  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.029  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:27.051  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.051  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.051  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.081  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.081  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.113  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.113  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.125  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.125  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.125  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.129  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:27.155  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.155  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.158  1203 18588 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118695021ms ago.
+08-23 06:40:27.158  1203 18861 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118692031ms ago.
+08-23 06:40:27.180  1585  1716 I bauth_FPBAuthService: pcf : 0x1012, 0 ,1 ,0 ,0 ,0 ,0, 16.0.0.0
+08-23 06:40:27.180  1585  1716 I bauth_FPBAuthService: thread id : 1, preenroll_flag : 0, nd cnt : 0, cso : 0, et : 0
+08-23 06:40:27.180  1585  1716 I bauth_FPBAuthService: FPBAuthService::timerHandler complete
+08-23 06:40:27.198  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.198  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.198  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.204  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.204  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.228  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.228  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.232  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:27.262  1203 18819 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118693067ms ago.
+08-23 06:40:27.271  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.272  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.272  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.295  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.295  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.302  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.302  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.305  1203 18484 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118696053ms ago.
+08-23 06:40:27.312  2336  2372 D SatelliteController: isInCarrierRoamingNbIotNtn: satellite is disabled
+08-23 06:40:27.314  2336  2372 D SatelliteController: getCarrierRoamingNtnConnectType: Falling back to global carrier config connect type: 0
+08-23 06:40:27.315  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1)
+08-23 06:40:27.315  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1) lastNotifiedSignalStrength level: 0
+08-23 06:40:27.315  2336  2372 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(1) currSignalStrength level: 0
+08-23 06:40:27.321  2401  2401 I EPDG-0 [CellularProfiler]: onSignalStrengthsChanged: SignalStrength:{mCdma=Invalid,mGsm=Invalid,mWcdma=Invalid,mTdscdma=Invalid,mLte=CellSignalStrengthLte: rssi=-107 rsrp=-107 rsrq=-8 rssnr=11 cqiTableIndex=2147483647 cqi=2147483647 ta=2147483647 level=3 parametersUseForLevel=0,mNr=Invalid,SignalBarInfo{ lteLevel=2 },rat=14,primary=CellSignalStrengthLte}
+08-23 06:40:27.322  2401  2835 I EPDG-0 [CellularProfiler]: lastLteRSRP is -106 currentLteRSRP is -107 lastLteRSRQ is -7 currentLteRSRQ is -8 lastLteSNR is 9 currentLteSNR is 11
+08-23 06:40:27.322  2401  2835 I EPDG-0 [LogMetrics]: set, type=LTE_RSRP_LAST, value=-107
+08-23 06:40:27.332  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:27.345  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.346  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.346  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.355   592   592 D io_stats: !@   8,32 r 48408711 1210605648 w 11774866 244625020 d 2838120 388732496 f 48964 179692 iot 13250504 0 th 0 0 0 pt 0 inp 0 0 592796.943
+08-23 06:40:27.356   592   592 D io_stats: !@ Write_top(KB): kworker/u32:4:/(3954) 240
+08-23 06:40:27.375  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.375  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.386  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.386  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.420  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.420  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.420  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.428  1203 18810 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118693065ms ago.
+08-23 06:40:27.435  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:27.449  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.449  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.477  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.477  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.493  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.493  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.494  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.522  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.523  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.540  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0
+08-23 06:40:27.566  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.567  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.567  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.568  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.569  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.596  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.596  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.614  1406  1418 E thermal_core: find_tz_idx_by_name:"Failed to find thermal zone index of ap_ntc\n"
+08-23 06:40:27.640  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.640  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.640  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.659  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.659  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.669  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.670  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.713  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.713  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.714  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.743  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.743  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.750  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.751  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.752  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0
+08-23 06:40:27.776  1203 18910 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118692013ms ago.
+08-23 06:40:27.787  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.787  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.787  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.792  1203 18443 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118697048ms ago.
+08-23 06:40:27.816  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.817  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.841  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.842  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.860  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-43, periodicAdvInt=0x0
+08-23 06:40:27.860  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.860  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.860  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.890  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.891  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:27.932  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:27.933  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:27.933  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:27.933  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:27.934  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:27.964  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:27.964  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.006  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.007  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.007  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.023  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.024  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.037  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.038  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.072  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:28.080  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.081  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.081  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.111  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.111  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.115  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.115  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.153  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.154  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.154  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.180  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:28.181  1585  1716 I bauth_FPBAuthService: pcf : 0x1012, 0 ,1 ,0 ,0 ,0 ,0, 16.0.0.0
+08-23 06:40:28.181  1585  1716 I bauth_FPBAuthService: thread id : 1, preenroll_flag : 0, nd cnt : 0, cso : 0, et : 0
+08-23 06:40:28.181  1585  1716 I bauth_FPBAuthService: FPBAuthService::timerHandler complete
+08-23 06:40:28.184  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.185  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.187  1203 18861 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118693060ms ago.
+08-23 06:40:28.188  1203 18588 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118696051ms ago.
+08-23 06:40:28.205  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.205  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.218  1203 18819 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118694024ms ago.
+08-23 06:40:28.227  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.227  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.228  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.258  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.259  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.261  1203 18484 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118697009ms ago.
+08-23 06:40:28.261  1278 31823 D AALLightSensor: oldLux=31 [SA:-1 LA:-1] newLux=31 (oriLux: 29)
+08-23 06:40:28.286  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-45, periodicAdvInt=0x0
+08-23 06:40:28.297  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.297  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.300  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.301  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.301  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.331  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.332  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.373  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.374  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.374  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.385  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-41, periodicAdvInt=0x0
+08-23 06:40:28.388  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.388  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.405  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.405  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.430  1203 18810 D C2MtkBufferManager: over 5000ms not request from VCodec but callback hooked, slow BM Cc fetch thread. Last get time was 118694067ms ago.
+08-23 06:40:28.447  1203 18861 W C2MtkBufferManager: [0xB4000076FFE21C20] fetchNewCcBlock: wait fence 0x0xb40000777b210a10 timed out. ret 110
+08-23 06:40:28.448  1203 18588 W C2MtkBufferManager: [0xB400007785C7D320] fetchNewCcBlock: wait fence 0x0xb4000077875c1590 timed out. ret 110
+08-23 06:40:28.448  1203 18484 W C2MtkBufferManager: [0xB400007785C7EF20] fetchNewCcBlock: wait fence 0x0xb400007785d17710 timed out. ret 110
+08-23 06:40:28.478  1203 18910 W C2MtkBufferManager: [0xB40000777B2A1820] fetchNewCcBlock: wait fence 0x0xb40000777b303700 timed out. ret 110
+08-23 06:40:28.478  1203 18819 W C2MtkBufferManager: [0xB4000076FFE20020] fetchNewCcBlock: wait fence 0x0xb4000076ffde4200 timed out. ret 110
+08-23 06:40:28.479  1203 18810 W C2MtkBufferManager: [0xB40000777B2A2D20] fetchNewCcBlock: wait fence 0x0xb4000076ffde48f0 timed out. ret 110
+08-23 06:40:28.480  1203 18443 W C2MtkBufferManager: [0xB40000778096D020] fetchNewCcBlock: wait fence 0x0xb400007787512180 timed out. ret 110
+08-23 06:40:28.483  1276  1297 D ccci_mdinit: (1):monitor_time_update_thread round:25422 ########
+08-23 06:40:28.490  3104  3390 I ScanController: onScanResult to scannerId: 12- eventType=0x10, addressType=1, address=XX:XX:XX:XX:70:74, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-42, periodicAdvInt=0x0

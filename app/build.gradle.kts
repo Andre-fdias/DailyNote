@@ -49,6 +49,11 @@ android {
         compose = true
         buildConfig = true
     }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 dependencies {
@@ -77,7 +82,13 @@ dependencies {
     
     // Osmdroid
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    
+    // MapLibre
+    implementation("org.maplibre.gl:android-sdk:11.4.0")
+    implementation("org.maplibre.gl:android-plugin-annotation-v9:3.0.0")
 
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.4")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.documentfile:documentfile:1.0.1")
 
@@ -114,4 +125,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    // Exportação Excel
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
 }

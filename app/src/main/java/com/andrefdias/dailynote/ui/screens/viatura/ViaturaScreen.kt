@@ -56,6 +56,7 @@ fun ViaturaScreen(
                         },
                         interactionSource = interactionSource,
                         modifier = Modifier
+                            .padding(end = 16.dp)
                             .scale(scale)
                             .size(36.dp)
                             .background(Color(0xFFFF9800), androidx.compose.foundation.shape.CircleShape)

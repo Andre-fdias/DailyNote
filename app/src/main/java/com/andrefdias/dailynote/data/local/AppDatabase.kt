@@ -22,9 +22,11 @@ import kotlinx.coroutines.launch
         RoomViatura::class,
         RoomMilitar::class,
         RoomEquipeServico::class,
-        RoomEquipeViatura::class
+        RoomEquipeViatura::class,
+        RoomConfiguracao::class,
+        RoomBackupLog::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,6 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun viaturaDao(): com.andrefdias.dailynote.data.local.dao.ViaturaDao
     abstract fun militarDao(): com.andrefdias.dailynote.data.local.dao.MilitarDao
     abstract fun equipeServicoDao(): com.andrefdias.dailynote.data.local.dao.EquipeServicoDao
+    abstract fun configuracaoDao(): com.andrefdias.dailynote.data.local.dao.ConfiguracaoDao
 
     companion object {
         @Volatile
@@ -62,6 +65,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_7_8 = object : androidx.room.migration.Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `configuracoes` (`id` TEXT NOT NULL, `tema` TEXT NOT NULL, `backupAutomatico` TEXT NOT NULL, `backupSomenteWifi` INTEGER NOT NULL, `backupUriSaf` TEXT, `ultimoBackupData` TEXT, `ultimoBackupTamanho` INTEGER NOT NULL, `ultimoBackupStatus` TEXT, PRIMARY KEY(`id`))")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `backup_log` (`id` TEXT NOT NULL, `dataHora` TEXT NOT NULL, `tipo` TEXT NOT NULL, `status` TEXT NOT NULL, `tamanho` INTEGER NOT NULL, `mensagem` TEXT, PRIMARY KEY(`id`))")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -75,7 +85,7 @@ abstract class AppDatabase : RoomDatabase() {
                         isCreatedJustNow = true
                     }
                 })
-                .addMigrations(MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .fallbackToDestructiveMigration()
                 .build()
                 

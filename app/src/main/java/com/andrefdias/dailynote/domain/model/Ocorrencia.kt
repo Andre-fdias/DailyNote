@@ -16,7 +16,10 @@ data class Ocorrencia(
     val endereco: String,
     val cidade: String,
     val latitude: Double? = null,
-    val longitude: Double? = null
+    val longitude: Double? = null,
+    val observacoes: String? = null,
+    val distancia: Double? = null,
+    val resultado: String? = null
 ) {
     // Helper para gerar id unico localmente caso precise iterar no compose
     val id: String get() = talao + vtr + data + qtrSaida

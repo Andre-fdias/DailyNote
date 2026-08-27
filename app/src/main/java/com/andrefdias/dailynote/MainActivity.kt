@@ -1,7 +1,7 @@
 package com.andrefdias.dailynote
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -91,7 +91,7 @@ private val historicoNavItems = listOf(
 )
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     @Inject
     lateinit var settingsRepository: com.andrefdias.dailynote.domain.repository.SettingsRepository
@@ -129,19 +129,39 @@ class MainActivity : ComponentActivity() {
                 "Escuro" -> true
                 else -> isSystemInDarkTheme()
             }
+            
+            val pinEnabled by settingsRepository.pinEnabledFlow.collectAsState(initial = false)
+            val biometricEnabled by settingsRepository.biometricEnabledFlow.collectAsState(initial = false)
+            val savedPin by settingsRepository.pinCodeFlow.collectAsState(initial = "")
+            
+            var isAuthenticated by remember { mutableStateOf(false) }
+            val needsAuth = pinEnabled || biometricEnabled
+            
+            LaunchedEffect(needsAuth) {
+                if (!needsAuth) isAuthenticated = true
+            }
 
             FireNotesTheme(darkTheme = isDarkTheme) {
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                val currentRoute = currentDestination?.route
+                if (!isAuthenticated && needsAuth) {
+                    com.andrefdias.dailynote.ui.screens.auth.AuthScreen(
+                        activity = this@MainActivity,
+                        pinEnabled = pinEnabled,
+                        biometricEnabled = biometricEnabled,
+                        savedPin = savedPin,
+                        onAuthenticated = { isAuthenticated = true }
+                    )
+                } else {
+                    val navController = rememberNavController()
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    val currentRoute = currentDestination?.route
 
-                val activeNavItems = when {
-                    currentRoute in listOf(
-                        Screen.AgendaCalendario.route,
-                        Screen.AgendaTarefas.route,
-                        Screen.AgendaEventos.route
-                    ) -> agendaNavItems
+                    val activeNavItems = when {
+                        currentRoute in listOf(
+                            Screen.AgendaCalendario.route,
+                            Screen.AgendaTarefas.route,
+                            Screen.AgendaEventos.route
+                        ) -> agendaNavItems
                     
                     currentRoute in listOf(
                         Screen.HistoricoMapaForca.route,
@@ -291,12 +311,8 @@ class MainActivity : ComponentActivity() {
                             val settingsViewModel: SettingsViewModel = hiltViewModel()
                             SettingsScreen(
                                 viewModel = settingsViewModel,
-                                onNavigateToCalendarSettings = {
-                                    navController.navigate(Screen.SettingsCalendar.route)
-                                },
-                                onNavigateToGoogleSync = {
-                                    navController.navigate(Screen.GoogleSync.route)
-                                }
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToWizard = { navController.navigate(Screen.CalendarWizard.route) }
                             )
                         }
                         composable(Screen.SettingsCalendar.route) {
@@ -332,9 +348,10 @@ class MainActivity : ComponentActivity() {
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
-                    }
-                }
-            }
-        }
+                        }
+                    } // Fechamento do NavHost
+                } // Fechamento do else
+            } // Fechamento do FireNotesTheme
+        } // Fechamento do setContent
     }
 }

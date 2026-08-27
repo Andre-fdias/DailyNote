@@ -740,16 +740,18 @@ fun GoogleStyleDayCell(
             val allItems = (events.map { it.titulo to parseHexColor(it.cor) } + tasks.map { it.titulo to Color(0xFF9C27B0) }).take(2)
             allItems.forEach { (title, c) ->
                 Box(
-                    modifier = Modifier.fillMaxWidth().height(10.dp)
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight()
                         .clip(RoundedCornerShape(2.dp))
-                        .background(c)
+                        .background(c),
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
                         text = title, 
-                        fontSize = 7.sp, 
+                        fontSize = 8.sp, 
+                        fontWeight = FontWeight.SemiBold,
                         color = Color.White, 
                         maxLines = 1, 
-                        modifier = Modifier.padding(horizontal = 2.dp),
+                        modifier = Modifier.padding(horizontal = 3.dp, vertical = 1.dp),
                         overflow = TextOverflow.Ellipsis
                     )
                 }
