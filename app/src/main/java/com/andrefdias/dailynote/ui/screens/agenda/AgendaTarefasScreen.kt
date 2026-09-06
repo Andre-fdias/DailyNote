@@ -72,7 +72,7 @@ fun AgendaTarefasScreen(
                 Icon(Icons.Default.Add, contentDescription = "Adicionar Tarefa")
             }
         },
-        containerColor = Color(0xFF1E2633)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (showAddSheet) {
             EventTaskDetailBottomSheet(
@@ -96,7 +96,7 @@ fun AgendaTarefasScreen(
         
         if (tarefasSorted.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Nenhuma tarefa encontrada.", color = Color.White.copy(alpha = 0.5f))
+                Text("Nenhuma tarefa encontrada.", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
             }
         } else {
             LazyColumn(
@@ -134,7 +134,7 @@ fun TarefaCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White.copy(alpha = 0.05f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable { onClick() }
     ) {
         Row(
@@ -165,14 +165,14 @@ fun TarefaCard(
                     text = tarefa.titulo,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isConcluida) Color.Gray else Color.White,
+                    color = if (isConcluida) Color.Gray else MaterialTheme.colorScheme.onSurfaceVariant,
                     textDecoration = if (isConcluida) TextDecoration.LineThrough else null
                 )
                 if (tarefa.descricao.isNotBlank()) {
                     Text(
                         text = tarefa.descricao,
                         fontSize = 14.sp,
-                        color = if (isConcluida) Color.Gray.copy(alpha=0.7f) else Color.White.copy(alpha = 0.7f),
+                        color = if (isConcluida) Color.Gray.copy(alpha=0.7f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         textDecoration = if (isConcluida) TextDecoration.LineThrough else null,
                         maxLines = 1
                     )

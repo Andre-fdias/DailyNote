@@ -9,8 +9,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.andrefdias.dailynote.domain.repository.SettingsRepository
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import com.andrefdias.dailynote.domain.model.EquipeConfig
@@ -25,12 +29,14 @@ data class AgendaState(
     val todasTarefas: List<CalendarTarefa> = emptyList(),
     val equipes: List<EquipeConfig> = emptyList(),
     val escalas: List<EscalaConfig> = emptyList(),
-    val escalasPorDia: Map<LocalDate, Map<Int, List<EquipeConfig>>> = emptyMap()
+    val escalasPorDia: Map<LocalDate, Map<Int, List<EquipeConfig>>> = emptyMap(),
+    val selectedEscalaFilter: String? = null
 )
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
-    private val repository: CalendarRepository
+    private val repository: CalendarRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -39,6 +45,19 @@ class AgendaViewModel @Inject constructor(
     init {
         loadData()
         loadAllData()
+        viewModelScope.launch {
+            settingsRepository.activeCalendarFilterFlow.collect { filter ->
+                val activeFilter = if (filter == "Todos") null else filter
+                _state.value = _state.value.copy(selectedEscalaFilter = activeFilter)
+                loadData()
+            }
+        }
+    }
+
+    fun setEscalaFilter(filter: String?) {
+        viewModelScope.launch {
+            settingsRepository.setActiveCalendarFilter(filter ?: "Todos")
+        }
     }
 
     fun selectDate(date: LocalDate) {
@@ -73,25 +92,31 @@ class AgendaViewModel @Inject constructor(
 
     private fun loadAllData() {
         viewModelScope.launch {
-            repository.getAllEventosFlow().collect { todos ->
-                _state.value = _state.value.copy(todosEventos = todos)
-            }
-        }
-        viewModelScope.launch {
-            repository.getAllTarefasFlow().collect { todas ->
-                _state.value = _state.value.copy(todasTarefas = todas)
-            }
-        }
-        viewModelScope.launch {
-            repository.getEquipesFlow().collect { equipes ->
-                _state.value = _state.value.copy(equipes = equipes)
-                // Precompute after loading
-                precomputeScales(_state.value.selectedDate.withDayOfMonth(1))
-            }
-        }
-        viewModelScope.launch {
-            repository.getEscalasFlow().collect { escalas ->
-                _state.value = _state.value.copy(escalas = escalas)
+            combine(
+                repository.getAllEventosFlow(),
+                repository.getAllTarefasFlow(),
+                repository.getEquipesFlow(),
+                repository.getEscalasFlow(),
+                _state.map { it.selectedEscalaFilter }.distinctUntilChanged()
+            ) { args ->
+                val allEventos = args[0] as List<CalendarEvento>
+                val allTarefas = args[1] as List<CalendarTarefa>
+                val allEquipes = args[2] as List<EquipeConfig>
+                val allEscalas = args[3] as List<EscalaConfig>
+                val filter = args[4] as String?
+
+                val filteredEventos = if (filter == null) allEventos else allEventos.filter { it.escalaId == null || it.escalaId == filter }
+                val filteredTarefas = if (filter == null) allTarefas else allTarefas.filter { it.escalaId == null || it.escalaId == filter }
+                val filteredEquipes = if (filter == null) allEquipes else allEquipes.filter { it.escalaId == filter }
+
+                _state.value.copy(
+                    todosEventos = filteredEventos,
+                    todasTarefas = filteredTarefas,
+                    equipes = filteredEquipes,
+                    escalas = allEscalas
+                )
+            }.collect { newState ->
+                _state.value = newState
                 precomputeScales(_state.value.selectedDate.withDayOfMonth(1))
             }
         }

@@ -51,6 +51,5 @@ enum class MapMode {
 
 enum class VisualizationMode {
     MARKERS,
-    CLUSTERS,
-    HEATMAP
+    CLUSTERS
 }

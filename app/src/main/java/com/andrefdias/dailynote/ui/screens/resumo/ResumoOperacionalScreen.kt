@@ -47,12 +47,18 @@ fun ResumoOperacionalScreen(
     val equipes by viewModel.equipesHistorico.collectAsState()
 
 
+    val isDark = com.andrefdias.dailynote.ui.designsystem.colors.FireColors.isDarkState
+    val topBarColor = if (isDark) androidx.compose.ui.graphics.Color(0xFF1E1E1E) else androidx.compose.ui.graphics.Color(0xFFFAFAFA)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Resumo Operacional", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = topBarColor,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
@@ -81,7 +87,7 @@ fun ResumoOperacionalScreen(
             
             if (equipesDoDia.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Nenhuma equipe cadastrada para hoje.", color = Color.Gray)
+                    Text("Nenhuma equipe cadastrada para hoje.", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                 }
             } else {
                 LazyColumn(
@@ -145,13 +151,26 @@ fun DashboardViaturaCard(
     val viaturasOperacionais = equipe.viaturas.count { it.viatura?.status == "Operacional" || it.viatura?.status == "Em ocorrência" }
 
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1B2333)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF37474F)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            val corFundoStr = equipe.equipeConfig?.corFundo
+            val badgeColor = if (corFundoStr != null) {
+                try { Color(android.graphics.Color.parseColor(corFundoStr)) } catch (e: Exception) { Color(0xFF1976D2) }
+            } else {
+                Color(0xFF1976D2)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(8.dp)
+                    .background(badgeColor)
+            )
+            Column(modifier = Modifier.weight(1f)) {
             // 1. Header Row
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 16.dp),
@@ -174,7 +193,7 @@ fun DashboardViaturaCard(
                     ) {
                         Text(
                             text = "${equipe.unidade.uppercase()} / ${equipe.posto.uppercase()}", 
-                            color = Color.White, 
+                            color = MaterialTheme.colorScheme.onSurface, 
                             fontWeight = FontWeight.Bold,
                             fontSize = 17.sp,
                             maxLines = 1,
@@ -210,13 +229,13 @@ fun DashboardViaturaCard(
 
                         // VTRs Badge
                         Box(
-                            modifier = Modifier.background(Color(0xFF283550), RoundedCornerShape(24.dp)).padding(horizontal = 12.dp, vertical = 6.dp)
+                            modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(24.dp)).padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "VTRs", tint = Color(0xFF64B5F6), modifier = Modifier.size(12.dp))
+                                Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "VTRs", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(12.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "VTRs: ", color = Color(0xFF64B5F6), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text(text = "$viaturasOperacionais / $totalViaturas", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = "VTRs: ", color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = "$viaturasOperacionais / $totalViaturas", color = MaterialTheme.colorScheme.onSurface, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -227,13 +246,13 @@ fun DashboardViaturaCard(
             Column(modifier = Modifier.padding(horizontal = 0.dp)) {
                 // Tabela Header
                 Row(
-                    modifier = Modifier.fillMaxWidth().background(Color(0xFF283550), RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)).padding(horizontal = 8.dp, vertical = 16.dp), 
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)).padding(horizontal = 8.dp, vertical = 16.dp), 
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("VTR", color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(0.9f))
-                    Text("SITUAÇÃO", color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1.3f))
-                    Text("PM", color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(0.4f))
-                    Text("ENCARREGADO", color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1.6f))
+                    Text("VTR", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1.0f))
+                    Text("SITUAÇÃO", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(0.9f))
+                    Text("PM", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(0.5f))
+                    Text("ENCARREGADO", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1.6f))
                 }
 
                 val viaturasSemTelegrafia = equipe.viaturas.filter { ev ->
@@ -250,7 +269,7 @@ fun DashboardViaturaCard(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF1E2738), bottomShape)
+                            .background(MaterialTheme.colorScheme.surface, bottomShape)
                             .clickable {
                                 bottomSheetTitle = ev.viatura?.prefixo ?: "Viatura"
                                 bottomSheetPms = ev.militaresEscalados
@@ -259,26 +278,26 @@ fun DashboardViaturaCard(
                             .padding(horizontal = 8.dp, vertical = 20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(ev.viatura?.prefixo ?: "-", color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(0.9f))
+                        Text(ev.viatura?.prefixo ?: "-", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, modifier = Modifier.weight(1.0f))
                         
                         // Status Chip
                         val status = ev.viatura?.status ?: "-"
-                        val statusBg = if (status.equals("Operacional", ignoreCase = true)) Color(0xFF1B5E20) else Color(0xFFE65100)
-                        val statusColor = if (status.equals("Operacional", ignoreCase = true)) Color(0xFFA5D6A7) else Color(0xFFFFCC80)
-                        Box(modifier = Modifier.weight(1.3f)) {
+                        val statusBg = if (status.equals("Operacional", ignoreCase = true)) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer
+                        val statusColor = if (status.equals("Operacional", ignoreCase = true)) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onErrorContainer
+                        Box(modifier = Modifier.weight(0.9f), contentAlignment = Alignment.Center) {
                             Box(modifier = Modifier.background(statusBg, RoundedCornerShape(12.dp)).padding(horizontal = 8.dp, vertical = 4.dp)) {
-                                Text(status, color = statusColor, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(status, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = statusColor, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                             }
                         }
                         
                         val pmCount = ev.militaresEscalados.size
-                        Text(pmCount.toString().padStart(2, '0'), color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(0.4f))
+                        Text(pmCount.toString().padStart(2, '0'), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, modifier = Modifier.weight(0.5f))
                         val encarregado = ev.militaresEscalados.find { it.funcao == "Comandante" }?.militar ?: ev.militaresEscalados.firstOrNull()?.militar
                         val encarregadoStr = encarregado?.let { "${it.graduacao} ${it.nomeGuerra}" } ?: "-"
-                        Text(encarregadoStr, color = Color.White, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1.6f))
+                        Text(encarregadoStr, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1.6f))
                     }
                     if (!isLast) {
-                        HorizontalDivider(color = Color(0xFF283550), modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.padding(horizontal = 16.dp))
                     }
                 }
             }
@@ -295,15 +314,16 @@ fun DashboardViaturaCard(
                             bottomSheetPms = pmsMergulhador
                             showBottomSheet = true
                         },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF283550)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Water, contentDescription = "Mergulhador", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
+                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Water, contentDescription = "Mergulhador", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("MERGULHADOR", color = Color(0xFFB0BEC5), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                Text(pmsMergulhador.size.toString().padStart(2, '0'), color = Color(0xFFE53935), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("MERGULHADOR", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(pmsMergulhador.size.toString().padStart(2, '0'), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.error, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -315,15 +335,16 @@ fun DashboardViaturaCard(
                             bottomSheetPms = pmsDejem
                             showBottomSheet = true
                         },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF283550)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Group, contentDescription = "Total DEJEM", tint = Color(0xFFFFB300), modifier = Modifier.size(18.dp))
+                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Group, contentDescription = "Total DEJEM", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("TOTAL DEJEM", color = Color(0xFFB0BEC5), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                Text(pmsDejem.size.toString().padStart(2, '0'), color = Color(0xFFFFB300), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("TOTAL DEJEM", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(pmsDejem.size.toString().padStart(2, '0'), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.secondary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -337,15 +358,16 @@ fun DashboardViaturaCard(
                             bottomSheetPms = pmsOvbLeve
                             showBottomSheet = true
                         },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF283550)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "OVB Leve", tint = Color(0xFF42A5F5), modifier = Modifier.size(18.dp))
+                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "OVB Leve", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("OVB LEVE", color = Color(0xFFB0BEC5), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                Text(pmsOvbLeve.size.toString().padStart(2, '0'), color = Color(0xFF42A5F5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("OVB LEVE", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(pmsOvbLeve.size.toString().padStart(2, '0'), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.primary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -357,15 +379,16 @@ fun DashboardViaturaCard(
                             bottomSheetPms = pmsOvbPesado
                             showBottomSheet = true
                         },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF283550)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "OVB Pesado", tint = Color(0xFF42A5F5), modifier = Modifier.size(18.dp))
+                            Icon(imageVector = androidx.compose.material.icons.Icons.Default.LocalShipping, contentDescription = "OVB Pesado", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("OVB PESADO", color = Color(0xFFB0BEC5), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                Text(pmsOvbPesado.size.toString().padStart(2, '0'), color = Color(0xFF42A5F5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("OVB PESADO", textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(pmsOvbPesado.size.toString().padStart(2, '0'), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = MaterialTheme.colorScheme.primary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -376,19 +399,19 @@ fun DashboardViaturaCard(
 
             // 4. Telegrafista
             Box(
-                modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth().border(1.dp, Color(0xFF37474F), RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 12.dp)
+                modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Person, contentDescription = "Telegrafista", tint = Color(0xFF9575CD), modifier = Modifier.size(20.dp))
+                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Person, contentDescription = "Telegrafista", tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("TELEGRAFISTA", color = Color(0xFFB0BEC5), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text("TELEGRAFISTA", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(telegrafistaStatus.uppercase(), color = if (telegrafistaStatus == "AGUARDANDO...") Color(0xFF4CAF50) else Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(telegrafistaStatus.uppercase(), color = if (telegrafistaStatus == "AGUARDANDO...") Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(color = Color(0xFF37474F))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             
             // 5. Efetivo Total
             Row(
@@ -397,41 +420,42 @@ fun DashboardViaturaCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Group, contentDescription = "Efetivo", tint = Color(0xFFB0BEC5), modifier = Modifier.size(20.dp))
+                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Group, contentDescription = "Efetivo", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("EFETIVO TOTAL", color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text("EFETIVO TOTAL", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Box(modifier = Modifier.background(Color(0xFF1B5E20), RoundedCornerShape(8.dp)).padding(horizontal = 16.dp, vertical = 8.dp)) {
-                        Text(efetivoTotal.toString().padStart(2, '0'), color = Color(0xFFA5D6A7), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Box(modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(8.dp)).padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        Text(efetivoTotal.toString().padStart(2, '0'), color = MaterialTheme.colorScheme.onTertiaryContainer, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 androidx.compose.material3.OutlinedButton(
                     onClick = onNavigateToEquipe,
-                    border = androidx.compose.foundation.BorderStroke(0.5.dp, Color(0xFFE53935).copy(alpha=0.6f)),
+                    border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.error.copy(alpha=0.6f)),
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                     modifier = Modifier.height(30.dp)
                 ) {
-                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Edit, contentDescription = "Editar", tint = Color(0xFFE53935), modifier = Modifier.size(13.dp))
+                    Icon(imageVector = androidx.compose.material.icons.Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(13.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Editar", color = Color(0xFFE53935), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                    Text("Editar", color = MaterialTheme.colorScheme.error, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                 }
             }
+        }
         }
     }
     
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
-            containerColor = Color(0xFF1B2333),
-            dragHandle = { androidx.compose.material3.BottomSheetDefaults.DragHandle(color = Color(0xFF37474F)) }
+            containerColor = MaterialTheme.colorScheme.surface,
+            dragHandle = { androidx.compose.material3.BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.outlineVariant) }
         ) {
             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp).fillMaxWidth()) {
-                Text(bottomSheetTitle.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = Color.White, letterSpacing = 1.sp)
+                Text(bottomSheetTitle.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface, letterSpacing = 1.sp)
                 Spacer(modifier = Modifier.height(16.dp))
                 if (bottomSheetPms.isEmpty()) {
-                    Text("Nenhum militar encontrado.", color = Color.Gray)
+                    Text("Nenhum militar encontrado.", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                 } else {
                     val sortedPms = bottomSheetPms.sortedByDescending { me -> 
                         var isAtivo = true
@@ -472,18 +496,28 @@ fun DashboardViaturaCard(
                             Card(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).let { if(!isAtivo) it.background(Color.Transparent) else it }.graphicsLayer { alpha = alphaValue },
                                 shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
-                                border = androidx.compose.foundation.BorderStroke(0.5.dp, Color(0xFF37474F))
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
                             ) {
+                                Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                                    val isDejemBar = me.tipoEscala == "DEJEM"
+                                    val barColor = if (isDejemBar) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .width(8.dp)
+                                            .background(barColor)
+                                    )
                                 Row(
-                                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                    modifier = Modifier.padding(16.dp).weight(1f),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Box(
-                                        modifier = Modifier.size(40.dp).background(Color(0xFF1B2333), CircleShape),
+                                        modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(imageVector = androidx.compose.material.icons.Icons.Default.Person, contentDescription = null, tint = Color(0xFF90A4AE), modifier = Modifier.size(20.dp))
+                                        Icon(imageVector = androidx.compose.material.icons.Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(20.dp))
                                     }
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Column(modifier = Modifier.weight(1f)) {
@@ -492,8 +526,8 @@ fun DashboardViaturaCard(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text("${pm.graduacao} ${pm.nomeGuerra}", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 15.sp)
-                                            Text("RE: ${pm.re}", color = Color(0xFF90A4AE), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                                            Text("${pm.graduacao} ${pm.nomeGuerra}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp)
+                                            Text("RE: ${pm.re}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                                         }
                                         
                                         val tags = mutableListOf<String>()
@@ -515,8 +549,8 @@ fun DashboardViaturaCard(
                                             ) {
                                                 tags.forEach { tag ->
                                                     val isTagDejem = tag.startsWith("DEJEM")
-                                                    val bgColor = if (isTagDejem) Color(0xFFFFB300).copy(alpha=0.15f) else Color(0xFF42A5F5).copy(alpha=0.15f)
-                                                    val textColor = if (isTagDejem) Color(0xFFFFCC80) else Color(0xFF90CAF9)
+                                                    val bgColor = if (isTagDejem) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer
+                                                    val textColor = if (isTagDejem) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer
                                                     Box(
                                                         modifier = Modifier.background(bgColor, RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp)
                                                     ) {
@@ -526,6 +560,7 @@ fun DashboardViaturaCard(
                                             }
                                         }
                                     }
+                                }
                                 }
                             }
                         }
@@ -547,7 +582,7 @@ fun IndicatorRow(label: String, value: String, valueColor: Color, onClick: () ->
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, color = Color(0xFFB0BEC5), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Text(value, color = valueColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
@@ -575,19 +610,19 @@ fun ResumoViaturaCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFD32F2F))
+                    .background(MaterialTheme.colorScheme.error)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(text = "Data: $dateFormatted", fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
-                    Text(text = "${viatura.viatura?.prefixo ?: "Prefixo Desconhecido"} - ${viatura.viatura?.tipo ?: ""}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                    Text(text = "Data: $dateFormatted", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
+                    Text(text = "${viatura.viatura?.prefixo ?: "Prefixo Desconhecido"} - ${viatura.viatura?.tipo ?: ""}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
                 }
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = "Expandir",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -608,7 +643,7 @@ fun ResumoViaturaCard(
                             if (pm != null) {
                                 Text("${me.funcao}: ${pm.graduacao} ${pm.nomeGuerra}", fontSize = 14.sp)
                             } else {
-                                Text("${me.funcao}: Não definido", fontSize = 14.sp, color = Color.Gray)
+                                Text("${me.funcao}: Não definido", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                             }
                         }
                     }

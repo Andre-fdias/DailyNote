@@ -8,11 +8,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -34,10 +39,19 @@ fun QuartelScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
+    val isDark = com.andrefdias.dailynote.ui.designsystem.colors.FireColors.isDarkState
+    val topBarColor = if (isDark) androidx.compose.ui.graphics.Color(0xFF1E1E1E) else androidx.compose.ui.graphics.Color(0xFFFAFAFA)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Cadastro de Quartel") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                ),
                 actions = {
                     val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
                     val isPressed by interactionSource.collectIsPressedAsState()
@@ -68,56 +82,100 @@ fun QuartelScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(quarteis, key = { it.id }) { quartel ->
+                    var expandedMenu by remember { mutableStateOf(false) }
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
-                        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                                    androidx.compose.foundation.layout.Box(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .background(Color(0xFF90A4AE).copy(alpha = 0.2f), CircleShape),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Build, 
-                                            contentDescription = null, 
-                                            tint = Color(0xFF90A4AE)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column {
+                        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width(8.dp)
+                                    .background(Color(0xFFE53935))
+                            )
+                            Column(modifier = Modifier.padding(16.dp).weight(1f)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(36.dp)
+                                                    .background(Color(0xFFE53935).copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(text = "🚒", style = MaterialTheme.typography.titleMedium)
+                                            }
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Text(
+                                                text = quartel.posto, 
+                                                style = MaterialTheme.typography.titleLarge,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                        
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        
                                         Text(
-                                            text = quartel.unidade, 
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
+                                            text = "Unidade: ${quartel.unidade}", 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
-                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
-                                            text = "${quartel.posto} - ${quartel.municipio}", 
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = Color(0xFF90A4AE)
+                                            text = "Município: ${quartel.municipio}", 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
-                                }
-                                Row {
-                                    IconButton(onClick = {
-                                        viewModel.selectQuartel(quartel)
-                                        showDialog = true
-                                    }) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color(0xFF90A4AE))
-                                    }
-                                    IconButton(onClick = { viewModel.deleteQuartel(quartel) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = Color(0xFFEF5350))
+                                    
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Box {
+                                            IconButton(onClick = { expandedMenu = true }, modifier = Modifier.size(24.dp).offset(x = 8.dp, y = (-8).dp)) {
+                                                Icon(Icons.Default.MoreVert, contentDescription = "Mais opções", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                            DropdownMenu(
+                                                expanded = expandedMenu,
+                                                onDismissRequest = { expandedMenu = false }
+                                            ) {
+                                                DropdownMenuItem(
+                                                    text = { Text("Editar") },
+                                                    onClick = { 
+                                                        expandedMenu = false
+                                                        viewModel.selectQuartel(quartel)
+                                                        showDialog = true 
+                                                    },
+                                                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("Excluir", color = Color(0xFFEF5350)) },
+                                                    onClick = { 
+                                                        expandedMenu = false
+                                                        viewModel.deleteQuartel(quartel) 
+                                                    },
+                                                    leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFEF5350)) }
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        
+                                        Image(
+                                            painter = painterResource(id = com.andrefdias.dailynote.R.drawable.quartel),
+                                            contentDescription = "Imagem do Quartel",
+                                            modifier = Modifier
+                                                .width(110.dp)
+                                                .height(80.dp)
+                                                .clip(RoundedCornerShape(8.dp)),
+                                            contentScale = ContentScale.Crop
+                                        )
                                     }
                                 }
                             }

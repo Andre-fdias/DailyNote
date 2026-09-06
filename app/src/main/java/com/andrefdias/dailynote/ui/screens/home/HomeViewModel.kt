@@ -8,6 +8,9 @@ import com.andrefdias.dailynote.domain.model.*
 import com.andrefdias.dailynote.domain.calendar.ScaleEngine
 import com.andrefdias.dailynote.domain.repository.CalendarRepository
 import com.andrefdias.dailynote.domain.repository.SettingsRepository
+import com.andrefdias.dailynote.domain.repository.OcorrenciaRepository
+import com.andrefdias.dailynote.domain.repository.EquipeServicoRepository
+import com.andrefdias.dailynote.domain.repository.ViaturaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +29,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val settingsRepository: SettingsRepository,
+    private val ocorrenciaRepository: OcorrenciaRepository,
+    private val equipeServicoRepository: EquipeServicoRepository,
+    private val viaturaRepository: ViaturaRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -63,6 +69,24 @@ class HomeViewModel @Inject constructor(
     private val _previewDays = MutableStateFlow<Map<LocalDate, Map<Int, List<EquipeConfig>>>>(emptyMap())
     val previewDays: StateFlow<Map<LocalDate, Map<Int, List<EquipeConfig>>>> = _previewDays.asStateFlow()
 
+    private val _occurrencesThisMonth = MutableStateFlow(0)
+    val occurrencesThisMonth: StateFlow<Int> = _occurrencesThisMonth.asStateFlow()
+
+    private val _occurrencesTotal = MutableStateFlow(0)
+    val occurrencesTotal: StateFlow<Int> = _occurrencesTotal.asStateFlow()
+
+    private val _occurrencesToday = MutableStateFlow(0)
+    val occurrencesToday: StateFlow<Int> = _occurrencesToday.asStateFlow()
+
+    private val _viaturasEmProntidao = MutableStateFlow<List<Viatura>>(emptyList())
+    val viaturasEmProntidao: StateFlow<List<Viatura>> = _viaturasEmProntidao.asStateFlow()
+
+    private val _evolutionData = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val evolutionData: StateFlow<Map<String, Int>> = _evolutionData.asStateFlow()
+
+    private val _natureData = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val natureData: StateFlow<Map<String, Int>> = _natureData.asStateFlow()
+
     private val _hasDismissedAlertsThisSession = MutableStateFlow(false)
     val hasDismissedAlertsThisSession: StateFlow<Boolean> = _hasDismissedAlertsThisSession.asStateFlow()
 
@@ -87,6 +111,111 @@ class HomeViewModel @Inject constructor(
             calendarRepository.getNotificacoesFlow().collect {
                 _notifications.value = it
                 _unreadNotificationCount.value = it.count { n -> !n.lida }
+            }
+        }
+        viewModelScope.launch {
+            kotlinx.coroutines.flow.combine(
+                ocorrenciaRepository.getAllLocalOcorrenciasFlow(),
+                ocorrenciaRepository.getAllVitimasFlow()
+            ) { ocorrencias, vitimas ->
+                val today = LocalDate.now()
+                val formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                
+                var totalVitimasMes = 0
+                var countToday = 0
+                var countMonth = 0
+                
+                val evolutionMap = mutableMapOf<String, Int>()
+                val ocorrenciasDoMes = mutableSetOf<String>()
+
+                ocorrencias.forEach { occ ->
+                    try {
+                        // Tenta extrair a data de diversas formas
+                        var date: LocalDate? = null
+                        val str = occ.data.trim()
+                        
+                        // Tenta d/M/yyyy, dd/MM/yyyy etc
+                        val formatterBr = java.time.format.DateTimeFormatter.ofPattern("d/M/yyyy")
+                        date = try {
+                            LocalDate.parse(str, formatterBr)
+                        } catch(e: Exception) {
+                            try {
+                                val fmt2 = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                                LocalDate.parse(str, fmt2)
+                            } catch(e2: Exception) {
+                                try {
+                                    LocalDate.parse(str) // YYYY-MM-DD
+                                } catch(e3: Exception) {
+                                    null
+                                }
+                            }
+                        }
+                        
+                        if (date == null && str.isNotEmpty()) {
+                            // Ultima tentativa: extrair os números se tiver no formato misto "04-09-2026"
+                            try {
+                                val parts = str.split(Regex("[/\\-]"))
+                                if (parts.size == 3) {
+                                    if (parts[0].length == 4) { // yyyy-mm-dd
+                                        date = LocalDate.of(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
+                                    } else { // dd-mm-yyyy
+                                        date = LocalDate.of(parts[2].toInt(), parts[1].toInt(), parts[0].toInt())
+                                    }
+                                }
+                            } catch (e: Exception) {}
+                        }
+                        
+                        if (date != null) {
+                            if (date.isEqual(today)) countToday++
+                            
+                            val thirtyDaysAgo = today.minusDays(30)
+                            if (!date.isBefore(thirtyDaysAgo) && !date.isAfter(today)) {
+                                countMonth++
+                                ocorrenciasDoMes.add(occ.id)
+                            }
+                            
+                            val dayKey = date.format(formatter)
+                            evolutionMap[dayKey] = (evolutionMap[dayKey] ?: 0) + 1
+                        }
+                    } catch(e: Exception) {}
+                }
+
+                totalVitimasMes = vitimas.count { it.ocorrenciaId in ocorrenciasDoMes }
+                
+                _occurrencesToday.value = countToday
+                _occurrencesThisMonth.value = countMonth
+                _occurrencesTotal.value = totalVitimasMes 
+                
+                val nMap = ocorrencias.groupingBy { it.natureza }.eachCount()
+                if (nMap.isNotEmpty()) {
+                    val top5 = nMap.entries.sortedByDescending { it.value }.take(5)
+                    _natureData.value = top5.associate { it.key to it.value }
+                } else {
+                    _natureData.value = emptyMap()
+                }
+                
+                _evolutionData.value = evolutionMap.toSortedMap()
+            }.collect { }
+        }
+        
+        viewModelScope.launch {
+            combine(
+                equipeServicoRepository.getAllEquipesServico(),
+                viaturaRepository.getAll()
+            ) { equipes, viaturas ->
+                val today = LocalDate.now()
+                val formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val todayStrIso = today.toString()
+                val todayStrBr = today.format(formatter)
+                val equipesHoje = equipes.filter { it.data == todayStrIso || it.data == todayStrBr }
+                if (equipesHoje.isNotEmpty()) {
+                    val viaturasHojeIds = equipesHoje.flatMap { eq -> eq.viaturas.map { it.viaturaId } }.toSet()
+                    viaturas.filter { it.id in viaturasHojeIds }
+                } else {
+                    emptyList()
+                }
+            }.collect {
+                _viaturasEmProntidao.value = it
             }
         }
     }

@@ -334,4 +334,275 @@ object ExportUtils {
             android.widget.Toast.makeText(context, "Erro ao exportar Excel", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun exportGeralOcorrenciasToPdf(context: Context, ocorrencias: List<com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia>) {
+        val document = PdfDocument()
+        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        var page = document.startPage(pageInfo)
+        var canvas = page.canvas
+        val paint = Paint().apply { color = Color.BLACK; textSize = 11f }
+        val titlePaint = Paint().apply { color = Color.BLACK; textSize = 16f; isFakeBoldText = true; textAlign = Paint.Align.CENTER }
+        val headerPaint = Paint().apply { color = Color.WHITE; textSize = 11f; isFakeBoldText = true }
+        val headerBgPaint = Paint().apply { color = Color.rgb(67, 56, 202) }
+        val bgZebraPaint = Paint().apply { color = Color.rgb(238, 242, 255) }
+
+        var yPos = 50f
+        val startX = 30f
+        
+        val dateStr = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        canvas.drawText("Relatório Geral de Ocorrências ($dateStr)", 595f / 2f, yPos, titlePaint)
+        yPos += 30f
+
+        val colWidths = floatArrayOf(80f, 90f, 150f, 215f)
+        val colHeaders = arrayOf("Talão", "Data", "Natureza", "Endereço")
+
+        // Draw header
+        canvas.drawRect(startX, yPos - 15f, 595f - 30f, yPos + 10f, headerBgPaint)
+        var currentX = startX + 5f
+        for (i in colHeaders.indices) {
+            canvas.drawText(colHeaders[i], currentX, yPos, headerPaint)
+            currentX += colWidths[i]
+        }
+        yPos += 25f
+
+        ocorrencias.forEachIndexed { index, occ ->
+            if (yPos > 800) {
+                document.finishPage(page)
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
+                page = document.startPage(pageInfo)
+                canvas = page.canvas
+                yPos = 50f
+            }
+            if (index % 2 == 1) canvas.drawRect(startX, yPos - 12f, 595f - 30f, yPos + 8f, bgZebraPaint)
+            
+            var x = startX + 5f
+            canvas.drawText(occ.talao, x, yPos, paint); x += colWidths[0]
+            canvas.drawText(occ.data, x, yPos, paint); x += colWidths[1]
+            // truncate strings
+            val nat = if (occ.natureza.length > 25) occ.natureza.substring(0, 22) + "..." else occ.natureza
+            canvas.drawText(nat, x, yPos, paint); x += colWidths[2]
+            
+            val end = "${occ.rua ?: ""} ${occ.numero ?: ""}".trim()
+            val endTrunc = if (end.length > 35) end.substring(0, 32) + "..." else end
+            canvas.drawText(endTrunc, x, yPos, paint)
+            yPos += 20f
+        }
+
+        document.finishPage(page)
+
+        val fileName = "Relatorio_Ocorrencias_${System.currentTimeMillis()}.pdf"
+        val file = File(context.cacheDir, fileName)
+        try { document.writeTo(FileOutputStream(file)) } catch (e: Exception) { e.printStackTrace() }
+        document.close()
+
+        shareFile(context, file, "application/pdf", "Compartilhar Relatório Geral")
+    }
+
+    fun exportOcorrenciaToPdf(context: Context, ocorrencia: com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia, incluirFotos: Boolean) {
+        val document = PdfDocument()
+        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        var page = document.startPage(pageInfo)
+        var canvas = page.canvas
+        val paint = Paint().apply { color = Color.BLACK; textSize = 12f }
+        val titlePaint = Paint().apply { color = Color.BLACK; textSize = 16f; isFakeBoldText = true; textAlign = Paint.Align.CENTER }
+        val sectionPaint = Paint().apply { color = Color.rgb(67, 56, 202); textSize = 14f; isFakeBoldText = true }
+        
+        var yPos = 50f
+        val startX = 40f
+        
+        canvas.drawText("Relatório de Ocorrência - Talão ${ocorrencia.talao}", 595f / 2f, yPos, titlePaint)
+        yPos += 40f
+        
+        fun newPageIfNeed(needed: Float = 30f) {
+            if (yPos + needed > 800) {
+                document.finishPage(page)
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
+                page = document.startPage(pageInfo)
+                canvas = page.canvas
+                yPos = 50f
+            }
+        }
+        
+        canvas.drawText("Data: ${ocorrencia.data}  Hora: ${ocorrencia.hora}", startX, yPos, paint); yPos += 20f
+        canvas.drawText("Viatura: ${ocorrencia.viatura}  Equipe: ${ocorrencia.equipe}", startX, yPos, paint); yPos += 20f
+        canvas.drawText("Natureza: ${ocorrencia.natureza}", startX, yPos, paint); yPos += 20f
+        val end = "${ocorrencia.rua ?: ""}, ${ocorrencia.numero ?: ""} - ${ocorrencia.bairro ?: ""} / ${ocorrencia.cidade ?: ""}"
+        canvas.drawText("Endereço: $end", startX, yPos, paint); yPos += 30f
+        
+        newPageIfNeed()
+        canvas.drawText("Histórico", startX, yPos, sectionPaint); yPos += 20f
+        // Text wrapper simples
+        val hist = ocorrencia.historico ?: "Nenhum histórico informado."
+        val words = hist.split(" ")
+        var line = ""
+        for (w in words) {
+            if (paint.measureText(line + w + " ") < 500) {
+                line += "$w "
+            } else {
+                canvas.drawText(line, startX, yPos, paint); yPos += 20f; newPageIfNeed()
+                line = "$w "
+            }
+        }
+        if (line.isNotEmpty()) { canvas.drawText(line, startX, yPos, paint); yPos += 30f; newPageIfNeed() }
+        
+        if (incluirFotos) {
+            try {
+                val type = object : com.google.gson.reflect.TypeToken<List<String>>() {}.type
+                val uris = com.google.gson.Gson().fromJson<List<String>>(ocorrencia.fotosUrisJson, type) ?: emptyList()
+                if (uris.isNotEmpty()) {
+                    canvas.drawText("Anexos (Fotos)", startX, yPos, sectionPaint); yPos += 30f
+                    uris.forEach { uriStr ->
+                        newPageIfNeed(300f)
+                        try {
+                            val uri = android.net.Uri.parse(uriStr)
+                            val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
+                                android.graphics.BitmapFactory.decodeStream(stream)
+                            }
+                            if (bitmap != null) {
+                                val scaledWidth = 500f
+                                val scaleRatio = scaledWidth / bitmap.width
+                                val scaledHeight = bitmap.height * scaleRatio
+                                val scaledBmp = android.graphics.Bitmap.createScaledBitmap(bitmap, scaledWidth.toInt(), scaledHeight.toInt(), true)
+                                canvas.drawBitmap(scaledBmp, startX, yPos, null)
+                                yPos += scaledHeight + 20f
+                            }
+                        } catch (e: Exception) {
+                            canvas.drawText("[Erro ao carregar imagem]", startX, yPos, paint); yPos += 20f
+                        }
+                    }
+                }
+            } catch (e: Exception) {}
+        }
+        
+        document.finishPage(page)
+
+        val fileName = "Relatorio_Tal_${ocorrencia.talao}_${System.currentTimeMillis()}.pdf"
+        val file = File(context.cacheDir, fileName)
+        try { document.writeTo(FileOutputStream(file)) } catch (e: Exception) {}
+        document.close()
+
+        shareFile(context, file, "application/pdf", "Compartilhar Ocorrência")
+    }
+
+    fun exportHistoricoGeralToPdf(context: Context, ocorrencias: List<com.andrefdias.dailynote.data.local.entities.RoomOcorrencia>) {
+        val document = PdfDocument()
+        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        var page = document.startPage(pageInfo)
+        var canvas = page.canvas
+        val paint = Paint().apply { color = Color.BLACK; textSize = 11f }
+        val titlePaint = Paint().apply { color = Color.BLACK; textSize = 16f; isFakeBoldText = true; textAlign = Paint.Align.CENTER }
+        val headerPaint = Paint().apply { color = Color.WHITE; textSize = 11f; isFakeBoldText = true }
+        val headerBgPaint = Paint().apply { color = Color.rgb(67, 56, 202) }
+        val bgZebraPaint = Paint().apply { color = Color.rgb(238, 242, 255) }
+
+        var yPos = 50f
+        val startX = 30f
+        
+        val dateStr = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        canvas.drawText("Relatório de Histórico de Despachos ($dateStr)", 595f / 2f, yPos, titlePaint)
+        yPos += 30f
+
+        val colWidths = floatArrayOf(80f, 130f, 180f, 145f)
+        val colHeaders = arrayOf("Protocolo", "Data/Hora", "Natureza", "Status")
+
+        // Draw header
+        canvas.drawRect(startX, yPos - 15f, 595f - 30f, yPos + 10f, headerBgPaint)
+        var currentX = startX + 5f
+        for (i in colHeaders.indices) {
+            canvas.drawText(colHeaders[i], currentX, yPos, headerPaint)
+            currentX += colWidths[i]
+        }
+        yPos += 25f
+
+        ocorrencias.forEachIndexed { index, occ ->
+            if (yPos > 800) {
+                document.finishPage(page)
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
+                page = document.startPage(pageInfo)
+                canvas = page.canvas
+                yPos = 50f
+            }
+            if (index % 2 == 1) canvas.drawRect(startX, yPos - 12f, 595f - 30f, yPos + 8f, bgZebraPaint)
+            
+            var x = startX + 5f
+            canvas.drawText(occ.protocolo, x, yPos, paint); x += colWidths[0]
+            val dh = if (occ.dataHora.length > 16) occ.dataHora.substring(0, 16) else occ.dataHora
+            canvas.drawText(dh, x, yPos, paint); x += colWidths[1]
+            val nat = if (occ.natureza.length > 25) occ.natureza.substring(0, 22) + "..." else occ.natureza
+            canvas.drawText(nat, x, yPos, paint); x += colWidths[2]
+            canvas.drawText(occ.status, x, yPos, paint)
+            yPos += 20f
+        }
+
+        document.finishPage(page)
+
+        val fileName = "Relatorio_Historico_${System.currentTimeMillis()}.pdf"
+        val file = File(context.cacheDir, fileName)
+        try { document.writeTo(FileOutputStream(file)) } catch (e: Exception) {}
+        document.close()
+
+        shareFile(context, file, "application/pdf", "Compartilhar Histórico")
+    }
+
+    fun exportMapaForcaGeralToPdf(context: Context, mapas: List<com.andrefdias.dailynote.domain.model.EquipeServico>) {
+        val document = PdfDocument()
+        var pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        var page = document.startPage(pageInfo)
+        var canvas = page.canvas
+        val paint = Paint().apply { color = Color.BLACK; textSize = 11f }
+        val titlePaint = Paint().apply { color = Color.BLACK; textSize = 16f; isFakeBoldText = true; textAlign = Paint.Align.CENTER }
+        val headerPaint = Paint().apply { color = Color.WHITE; textSize = 11f; isFakeBoldText = true }
+        val headerBgPaint = Paint().apply { color = Color.rgb(67, 56, 202) }
+        val bgZebraPaint = Paint().apply { color = Color.rgb(238, 242, 255) }
+
+        var yPos = 50f
+        val startX = 30f
+        
+        val dateStr = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        canvas.drawText("Relatório de Mapa Força ($dateStr)", 595f / 2f, yPos, titlePaint)
+        yPos += 30f
+
+        val colWidths = floatArrayOf(80f, 150f, 200f, 105f)
+        val colHeaders = arrayOf("Data", "Unidade", "Cmt Equipe", "Viaturas")
+
+        // Draw header
+        canvas.drawRect(startX, yPos - 15f, 595f - 30f, yPos + 10f, headerBgPaint)
+        var currentX = startX + 5f
+        for (i in colHeaders.indices) {
+            canvas.drawText(colHeaders[i], currentX, yPos, headerPaint)
+            currentX += colWidths[i]
+        }
+        yPos += 25f
+
+        mapas.forEachIndexed { index, mapa ->
+            if (yPos > 800) {
+                document.finishPage(page)
+                pageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
+                page = document.startPage(pageInfo)
+                canvas = page.canvas
+                yPos = 50f
+            }
+            if (index % 2 == 1) canvas.drawRect(startX, yPos - 12f, 595f - 30f, yPos + 8f, bgZebraPaint)
+            
+            var x = startX + 5f
+            canvas.drawText(mapa.data, x, yPos, paint); x += colWidths[0]
+            val un = if (mapa.unidade.length > 20) mapa.unidade.substring(0, 18) + "..." else mapa.unidade
+            canvas.drawText(un, x, yPos, paint); x += colWidths[1]
+            val cmtNome = mapa.viaturas.flatMap { it.militaresEscalados }.find { it.funcao.contains("Comandante", true) }?.militar?.nomeGuerra ?: "N/I"
+            val cmt = if (cmtNome.length > 25) cmtNome.substring(0, 22) + "..." else cmtNome
+            canvas.drawText(cmt, x, yPos, paint); x += colWidths[2]
+            val vt = mapa.viaturas.size.toString()
+            canvas.drawText("$vt Vtr(s)", x, yPos, paint)
+            yPos += 20f
+        }
+
+        document.finishPage(page)
+
+        val fileName = "Relatorio_MapaForca_${System.currentTimeMillis()}.pdf"
+        val file = File(context.cacheDir, fileName)
+        try { document.writeTo(FileOutputStream(file)) } catch (e: Exception) {}
+        document.close()
+
+        shareFile(context, file, "application/pdf", "Compartilhar Mapa Força")
+    }
 }

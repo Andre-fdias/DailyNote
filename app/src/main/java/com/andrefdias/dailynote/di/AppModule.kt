@@ -115,6 +115,12 @@ abstract class AppModule {
 
         @Provides
         @Singleton
+        fun provideOcorrenciaDao(database: AppDatabase): com.andrefdias.dailynote.data.local.dao.OcorrenciaDao {
+            return database.ocorrenciaDao()
+        }
+
+        @Provides
+        @Singleton
         fun provideRetrofit(): retrofit2.Retrofit {
             val client = okhttp3.OkHttpClient.Builder()
                 .followRedirects(true)

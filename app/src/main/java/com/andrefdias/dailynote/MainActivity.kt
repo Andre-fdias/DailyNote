@@ -37,6 +37,7 @@ import com.andrefdias.dailynote.ui.screens.calendar.GoogleSyncScreen
 import com.andrefdias.dailynote.ui.screens.calendar.SettingsCalendarScreen
 import com.andrefdias.dailynote.ui.screens.calendar.SettingsCalendarViewModel
 import com.andrefdias.dailynote.ui.screens.home.HomeScreen
+import com.andrefdias.dailynote.ui.screens.ocorrencias.DashboardOcorrenciasScreen
 import com.andrefdias.dailynote.ui.screens.militar.MilitarScreen
 import com.andrefdias.dailynote.ui.screens.quartel.QuartelScreen
 import com.andrefdias.dailynote.ui.screens.viatura.ViaturaScreen
@@ -88,6 +89,14 @@ private val historicoNavItems = listOf(
     BottomNavItem(Screen.MapaForcaRoot, "Voltar", Icons.Filled.ArrowBack, Icons.Outlined.ArrowBack),
     BottomNavItem(Screen.HistoricoMapaForca, "Mapa Força", Icons.Filled.Analytics, Icons.Outlined.Analytics),
     BottomNavItem(Screen.HistoricoDashboard, "Ocorrência", Icons.Filled.LocalPolice, Icons.Outlined.LocalPolice)
+)
+
+private val ocorrenciasNavItems = listOf(
+    BottomNavItem(Screen.Home, "Início", Icons.Filled.Home, Icons.Outlined.Home),
+    BottomNavItem(Screen.OcorrenciasDashboard, "Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard),
+    BottomNavItem(Screen.OcorrenciasNova, "Nova Ocorrência", Icons.Filled.AddCircle, Icons.Outlined.AddCircle),
+    BottomNavItem(Screen.OcorrenciasConsultar, "Histórico", Icons.Filled.History, Icons.Outlined.History),
+    BottomNavItem(Screen.Relatorios, "Relatórios", Icons.Filled.Description, Icons.Outlined.Description)
 )
 
 @AndroidEntryPoint
@@ -163,27 +172,34 @@ class MainActivity : FragmentActivity() {
                             Screen.AgendaEventos.route
                         ) -> agendaNavItems
                     
-                    currentRoute in listOf(
-                        Screen.HistoricoMapaForca.route,
-                        Screen.HistoricoDashboard.route
-                    ) -> historicoNavItems
+                        currentRoute in listOf(
+                            Screen.HistoricoMapaForca.route,
+                            Screen.HistoricoDashboard.route
+                        ) -> historicoNavItems
                     
-                    currentRoute in listOf(
-                        Screen.MapaDia.route,
-                        Screen.EquipeServico.route,
-                        Screen.Militar.route,
-                        Screen.Viatura.route,
-                        Screen.Quartel.route
-                    ) -> mapaForcaNavItems
+                        currentRoute in listOf(
+                            Screen.MapaDia.route,
+                            Screen.EquipeServico.route,
+                            Screen.Militar.route,
+                            Screen.Viatura.route,
+                            Screen.Quartel.route
+                        ) -> mapaForcaNavItems
+                        
+                        currentRoute in listOf(
+                            Screen.OcorrenciasDashboard.route,
+                            Screen.OcorrenciasNova.route,
+                            Screen.OcorrenciasConsultar.route,
+                            Screen.OcorrenciasOpcoes.route,
+                            Screen.Relatorios.route
+                        ) -> ocorrenciasNavItems
                     
-                    currentRoute in listOf(
-                        Screen.Home.route, 
-                        Screen.Settings.route, 
-                        Screen.OcorrenciasEmConstrucao.route
-                    ) -> mainNavItems
+                        currentRoute in listOf(
+                            Screen.Home.route, 
+                            Screen.Settings.route
+                        ) -> mainNavItems
                     
-                    else -> null
-                }
+                        else -> null
+                    }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -197,7 +213,7 @@ class MainActivity : FragmentActivity() {
                                     val mappedRoute = when (item.screen) {
                                         Screen.AgendaRoot -> Screen.AgendaCalendario.route
                                         Screen.MapaForcaRoot -> Screen.MapaDia.route
-                                        Screen.OcorrenciasRoot -> Screen.OcorrenciasEmConstrucao.route
+                                        Screen.OcorrenciasRoot -> Screen.OcorrenciasDashboard.route
                                         else -> item.screen.route
                                     }
                                     
@@ -253,7 +269,20 @@ class MainActivity : FragmentActivity() {
                             HomeScreen(
                                 viewModel = calendarViewModel,
                                 onNavigateToWizard = { navController.navigate(Screen.CalendarWizard.route) },
-                                onNavigateToConsult = { navController.navigate(Screen.Settings.route) }
+                                onNavigateToConsult = { navController.navigate(Screen.OcorrenciasDashboard.route) },
+                                onNavigateToViaturas = { navController.navigate(Screen.Viatura.route) },
+                                onNavigateToNova = { navController.navigate(Screen.OcorrenciasNova.route) },
+                                onNavigateToRelatorios = { navController.navigate(Screen.Relatorios.route) },
+                                onNavigateToMapaForca = { navController.navigate(Screen.HistoricoMapaForca.route) },
+                                onNavigateToHistoricoMapa = { navController.navigate("historico_dashboard_mapa") }
+                            )
+                        }
+                        composable("historico_dashboard_mapa") {
+                            com.andrefdias.dailynote.ui.screens.historico.HistoricoDashboardScreen(initialTab = 1)
+                        }
+                        composable(Screen.Relatorios.route) {
+                            com.andrefdias.dailynote.ui.screens.relatorios.RelatoriosScreen(
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                         composable(Screen.AgendaCalendario.route) {
@@ -270,8 +299,34 @@ class MainActivity : FragmentActivity() {
                                 onNavigateToEquipe = { navController.navigate(Screen.EquipeServico.route) }
                             )
                         }
-                        composable(Screen.OcorrenciasEmConstrucao.route) {
-                            OcorrenciasEmConstrucaoScreen()
+                        composable(Screen.OcorrenciasNova.route) {
+                            com.andrefdias.dailynote.ui.screens.ocorrencias.CadastroOcorrenciaScreen(
+                                onNavigateToOpcoes = { talao -> navController.navigate(Screen.OcorrenciasOpcoes.createRoute(talao)) }
+                            )
+                        }
+                        composable(Screen.OcorrenciasConsultar.route) {
+                            com.andrefdias.dailynote.ui.screens.ocorrencias.ConsultarOcorrenciasScreen(
+                                onNavigateToOpcoes = { talao -> navController.navigate(Screen.OcorrenciasOpcoes.createRoute(talao)) }
+                            )
+                        }
+                        composable(
+                            route = Screen.OcorrenciasOpcoes.route,
+                            arguments = listOf(androidx.navigation.navArgument("talao") { type = androidx.navigation.NavType.StringType })
+                        ) { backStackEntry ->
+                            val talao = backStackEntry.arguments?.getString("talao") ?: ""
+                            com.andrefdias.dailynote.ui.screens.ocorrencias.OcorrenciaOpcoesScreen(
+                                ocorrenciaId = talao,
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToCadastrarViatura = { navController.navigate(Screen.Viatura.route) },
+                                onNavigateToCadastrarMilitar = { navController.navigate(Screen.Militar.route) }
+                            )
+                        }
+                        composable(Screen.OcorrenciasDashboard.route) {
+                            DashboardOcorrenciasScreen(
+                                onNavigateToNova = { navController.navigate(Screen.OcorrenciasNova.route) },
+                                onNavigateToConsultar = { navController.navigate(Screen.OcorrenciasConsultar.route) },
+                                onNavigateToOpcoes = { talao -> navController.navigate(Screen.OcorrenciasOpcoes.createRoute(talao)) }
+                            )
                         }
                         composable(Screen.Quartel.route) {
                             QuartelScreen(

@@ -141,10 +141,19 @@ fun EquipeServicoScreen(
         }
     }
 
+    val isDark = com.andrefdias.dailynote.ui.designsystem.colors.FireColors.isDarkState
+    val topBarColor = if (isDark) androidx.compose.ui.graphics.Color(0xFF1E1E1E) else androidx.compose.ui.graphics.Color(0xFFFAFAFA)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Equipe de Serviço") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                ),
                 actions = {
                     if (equipeServico != null) {
                         IconButton(onClick = { showClearDialog = true }) {
@@ -193,11 +202,12 @@ fun EquipeServicoScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
-                    border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Configuração Diária", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                        Text("Configuração Diária", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         
                         OutlinedTextField(
                             value = displayData,
@@ -319,7 +329,7 @@ fun EquipeServicoScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Viaturas Empenhadas", style = MaterialTheme.typography.titleMedium, color = Color.White)
+                        Text("Viaturas Empenhadas", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         
                         ExposedDropdownMenuBox(
                             expanded = expandedAddViatura,
@@ -444,16 +454,24 @@ fun ViaturaCard(
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
-        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(8.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            Column(modifier = Modifier.weight(1f).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = eqViatura.viatura?.prefixo ?: "Viatura Desconhecida",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = onRemoveViatura) {
@@ -462,7 +480,7 @@ fun ViaturaCard(
             }
 
             if (eqViatura.militaresEscalados.isNotEmpty()) {
-                Divider(color = Color(0xFF37474F), thickness = 0.5.dp)
+                Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
             }
 
             // Lista de militares
@@ -473,20 +491,20 @@ fun ViaturaCard(
                             androidx.compose.foundation.layout.Box(
                                 modifier = Modifier
                                     .size(8.dp)
-                                    .background(Color(0xFF4CAF50), CircleShape)
+                                    .background(MaterialTheme.colorScheme.secondary, CircleShape)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "${me.funcao}: ${me.militar?.graduacao ?: ""} ${me.militar?.nomeGuerra ?: ""}", fontWeight = FontWeight.Bold, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                            Text(text = "${me.funcao}: ${me.militar?.graduacao ?: ""} ${me.militar?.nomeGuerra ?: ""}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
                         }
                         
                         val details = if (me.tipoEscala == "DEJEM") "DEJEM (${me.dejemHorarioInicio} - ${me.dejemHorarioFim})" else me.tipoEscala
-                        Text(text = details, style = MaterialTheme.typography.bodySmall, color = Color(0xFF90A4AE), modifier = Modifier.padding(start = 16.dp))
+                        Text(text = details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.padding(start = 16.dp))
                     }
                     IconButton(onClick = {
                         val novaLista = eqViatura.militaresEscalados.filter { it.id != me.id }
                         onUpdateViatura(eqViatura.copy(militaresEscalados = novaLista))
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Remover Militar", tint = Color(0xFF90A4AE))
+                        Icon(Icons.Default.Close, contentDescription = "Remover Militar", tint = MaterialTheme.colorScheme.onSecondaryContainer)
                     }
                 }
             }
@@ -523,6 +541,7 @@ fun ViaturaCard(
             ) {
                 Text("Salvar Viatura")
             }
+        }
         }
     }
 }

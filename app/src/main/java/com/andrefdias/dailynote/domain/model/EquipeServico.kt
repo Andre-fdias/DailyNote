@@ -22,7 +22,7 @@ data class EquipeServico(
     val unidade: String,
     val posto: String,
     val escalaId: String? = null,
-    val tipoEscala: String = "DEJEM", // Global scale of the post
+    val tipoEscala: String = "", // Global scale of the post
     val dejemHorarioInicio: String? = null,
     val dejemHorarioFim: String? = null,
     val viaturas: List<EquipeViatura> = emptyList(),

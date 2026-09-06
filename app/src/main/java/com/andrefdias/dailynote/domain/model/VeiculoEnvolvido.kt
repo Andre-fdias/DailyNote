@@ -1,33 +1,16 @@
 package com.andrefdias.dailynote.domain.model
 
-data class VeiculoMaster(
-    val id: String? = null,
-    val placa: String,
-    val renavam: String? = null,
-    val chassi: String? = null,
-    val marca: String? = null,
-    val modelo: String? = null,
-    val versao: String? = null,
-    val tipo: String? = null,
-    val categoria: String? = null,
-    val cor: String? = null,
-    val anoFabricacao: Int? = null,
-    val anoModelo: Int? = null,
-    val proprietarioId: String? = null,
-    val status: String = "Ativo"
-)
-
 data class VeiculoEnvolvido(
     val id: String? = null,
     val ocorrenciaId: String,
-    val placa: String = "",                    // Formatado Mercosul
+    val placa: String = "",
     val modelo: String = "",
     val cor: String = "",
     val chassi: String = "",
-    val anoFabricacao: Int? = null,            // mantido para veículos antigos
-    val anoModelo: Int? = null,                // mantido para veículos antigos
-    val ano: String = "",                      // "2024/2025" - formato exibição
-    val proprietarioId: String? = null,        // Referência à Pessoa
+    val anoFabricacao: Int? = null,
+    val anoModelo: Int? = null,
+    val ano: String = "",
+    val proprietarioId: String? = null,
     
     // Campos OCR do CRLV (mantidos para referência)
     val marca: String = "",
@@ -46,7 +29,8 @@ data class VeiculoEnvolvido(
     val especie: String? = null,
     val tipoVeiculo: String? = null,
     val carroceria: String? = null,
-    val categoriaVeiculo: String? = null
+    val categoriaVeiculo: String? = null,
+    val fotosVeiculoUris: List<String> = emptyList()
 )
 
 data class Motorista(

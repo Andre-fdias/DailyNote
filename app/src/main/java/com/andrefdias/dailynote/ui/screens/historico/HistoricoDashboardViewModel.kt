@@ -56,6 +56,7 @@ data class HistoricoDashboardState(
     val filtroHoraFim: String? = null,
     val filtroProntidao: String? = null,
     val filtroResultado: String? = null,
+    val filtroPosto: String? = null,
     val filtroTextoLivre: String = ""
 )
 
@@ -158,6 +159,11 @@ class HistoricoDashboardViewModel @Inject constructor(
         _state.value = _state.value.copy(filtroResultado = resultado)
         aplicarFiltrosLocais()
     }
+    
+    fun setFiltroPosto(posto: String?) {
+        _state.value = _state.value.copy(filtroPosto = posto)
+        aplicarFiltrosLocais()
+    }
 
     fun limparFiltros() {
         _state.value = _state.value.copy(
@@ -171,6 +177,7 @@ class HistoricoDashboardViewModel @Inject constructor(
             filtroHoraFim = null,
             filtroProntidao = null,
             filtroResultado = null,
+            filtroPosto = null,
             filtroTextoLivre = "",
             paginaAtual = 1
         )
@@ -336,6 +343,16 @@ class HistoricoDashboardViewModel @Inject constructor(
                 val prefixoNorm = prefixo.replace(Regex("[^a-zA-Z0-9]"), "").uppercase()
                 filtradas = filtradas.filter { occ -> 
                     occ.ocorrencia.vtr.replace(Regex("[^a-zA-Z0-9]"), "").uppercase() == prefixoNorm
+                }
+            }
+        }
+
+        // Posto filter
+        estadoAtual.filtroPosto?.let { postoNome ->
+            if (postoNome.isNotBlank()) {
+                val prefixosValidos = estadoAtual.todasViaturas.filter { it.posto == postoNome }.map { it.prefixo.replace(Regex("[^a-zA-Z0-9]"), "").uppercase() }
+                filtradas = filtradas.filter { occ ->
+                    occ.ocorrencia.vtr.replace(Regex("[^a-zA-Z0-9]"), "").uppercase() in prefixosValidos
                 }
             }
         }

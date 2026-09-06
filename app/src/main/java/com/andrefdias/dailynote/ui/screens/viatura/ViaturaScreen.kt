@@ -7,7 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +20,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
 
 val tiposAtendimento = listOf("Resgate", "Incêndio", "Salvamento", "Administrativa")
@@ -40,10 +47,19 @@ fun ViaturaScreen(
     var expandedPosto by remember { mutableStateOf(false) }
     var expandedTipoAtendimento by remember { mutableStateOf(false) }
 
+    val isDark = com.andrefdias.dailynote.ui.designsystem.colors.FireColors.isDarkState
+    val topBarColor = if (isDark) androidx.compose.ui.graphics.Color(0xFF1E1E1E) else androidx.compose.ui.graphics.Color(0xFFFAFAFA)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Cadastro de Viaturas") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                ),
                 actions = {
                     val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
                     val isPressed by interactionSource.collectIsPressedAsState()
@@ -75,67 +91,229 @@ fun ViaturaScreen(
             ) {
                 items(viaturas, key = { it.id }) { viatura ->
                     Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF232D42)),
-                        border = BorderStroke(0.5.dp, Color(0xFF37474F))
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "${viatura.prefixo} (${viatura.tipo})", 
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "Atendimento: ${viatura.tipoAtendimento}", 
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color(0xFF90A4AE)
-                                    )
-                                    Text(
-                                        text = "Local: ${viatura.unidade} - ${viatura.posto}", 
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color(0xFF90A4AE)
-                                    )
-                                }
-                                Row {
-                                    IconButton(onClick = {
-                                        viewModel.selectViatura(viatura)
-                                        showDialog = true
-                                    }) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color(0xFF90A4AE))
-                                    }
-                                    IconButton(onClick = { viewModel.deleteViatura(viatura) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = Color(0xFFEF5350))
-                                    }
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            val statusColor = when(viatura.status) {
-                                "Operacional" -> Color(0xFF4CAF50)
-                                "Manutenção", "Baixada" -> Color(0xFFEF5350)
-                                "Em ocorrência" -> Color(0xFFFF9800)
-                                else -> Color(0xFF90A4AE)
-                            }
+                        val viaturaColor = when (viatura.tipo) {
+                            "AT" -> Color(0xFFE53935)
+                            "UR" -> Color(0xFF1E88E5)
+                            "ABS" -> Color(0xFFFB8C00)
+                            "COM" -> Color(0xFF8E24AA)
+                            else -> Color(0xFF757575)
+                        }
+                        val viaturaEmoji = when (viatura.tipo) {
+                            "AT" -> "🔥"
+                            "UR" -> "⚕️"
+                            "ABS" -> "🚘"
+                            "COM" -> "📡"
+                            else -> "🚒"
+                        }
+                        val tipoFull = when (viatura.tipo) {
+                            "AT" -> "Auto Tanque"
+                            "UR" -> "Unidade de Resgate"
+                            "ABS" -> "Auto Bomba Salvamento"
+                            "COM" -> "Centro de Comunicação"
+                            else -> "Outros"
+                        }
+
+                        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                             Box(
                                 modifier = Modifier
-                                    .background(statusColor.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = viatura.status,
-                                    color = statusColor,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold
+                                    .fillMaxHeight()
+                                    .width(6.dp)
+                                    .background(viaturaColor)
+                            )
+                            Column(modifier = Modifier.padding(16.dp).weight(1f)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    // Left side info
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(56.dp)
+                                                    .background(viaturaColor, RoundedCornerShape(12.dp)),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(text = viaturaEmoji, fontSize = 28.sp)
+                                            }
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Column {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Text(
+                                                        text = viatura.prefixo, 
+                                                        style = MaterialTheme.typography.titleLarge,
+                                                        fontWeight = FontWeight.ExtraBold,
+                                                        color = MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .background(viaturaColor, RoundedCornerShape(16.dp))
+                                                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(text = viatura.tipo, color = Color.White, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                                    }
+                                                }
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Text(
+                                                    text = tipoFull, 
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                        
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        
+                                        Text(
+                                            text = "Unidade: ${viatura.unidade}", 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Posto: ${viatura.posto}", 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Atendimento: ${viatura.tipoAtendimento}", 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    
+                                    // Right side image & 3-dots
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        var expandedMenu by remember { mutableStateOf(false) }
+                                        Box {
+                                            IconButton(onClick = { expandedMenu = true }, modifier = Modifier.size(24.dp).offset(x = 8.dp, y = (-8).dp)) {
+                                                Icon(Icons.Default.MoreVert, contentDescription = "Mais opções", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                            DropdownMenu(
+                                                expanded = expandedMenu,
+                                                onDismissRequest = { expandedMenu = false }
+                                            ) {
+                                                DropdownMenuItem(
+                                                    text = { Text("Editar") },
+                                                    onClick = { 
+                                                        expandedMenu = false
+                                                        viewModel.selectViatura(viatura)
+                                                        showDialog = true 
+                                                    },
+                                                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text("Excluir", color = Color(0xFFEF5350)) },
+                                                    onClick = { 
+                                                        expandedMenu = false
+                                                        viewModel.deleteViatura(viatura) 
+                                                    },
+                                                    leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFEF5350)) }
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        
+                                        val imgRes = when(viatura.tipoAtendimento) {
+                                            "Resgate" -> com.andrefdias.dailynote.R.drawable.viatura_ur
+                                            "Incêndio" -> com.andrefdias.dailynote.R.drawable.viatura_at
+                                            "Salvamento" -> com.andrefdias.dailynote.R.drawable.viatura_abs
+                                            "Administrativa" -> {
+                                                if (viatura.status.equals("Telegrafia", ignoreCase = true)) {
+                                                    com.andrefdias.dailynote.R.drawable.viatura_telegrafia
+                                                } else if (viatura.tipo.equals("VO", ignoreCase = true)) {
+                                                    com.andrefdias.dailynote.R.drawable.viatura_abs
+                                                } else {
+                                                    com.andrefdias.dailynote.R.drawable.viatura_com
+                                                }
+                                            }
+                                            else -> com.andrefdias.dailynote.R.drawable.viatura_at
+                                        }
+                                        Image(
+                                            painter = painterResource(id = imgRes),
+                                            contentDescription = "Imagem da Viatura",
+                                            modifier = Modifier
+                                                .width(110.dp)
+                                                .height(80.dp)
+                                                .clip(RoundedCornerShape(8.dp)),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+                                }
+                                
+                                Spacer(modifier = Modifier.height(16.dp))
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val statusColor = when(viatura.status) {
+                                        "Operacional" -> Color(0xFF4CAF50)
+                                        "Manutenção", "Baixada" -> Color(0xFFEF5350)
+                                        "Em ocorrência" -> Color(0xFFFF9800)
+                                        "Reserva" -> Color(0xFF9E9E9E)
+                                        "Ativo" -> Color(0xFF2196F3)
+                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .background(statusColor.copy(alpha = 0.15f), shape = RoundedCornerShape(16.dp))
+                                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(8.dp)
+                                                    .background(statusColor, CircleShape)
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = viatura.status,
+                                                color = statusColor,
+                                                style = MaterialTheme.typography.labelMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Add the Legend at the bottom of the list
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(
+                            "AT" to Color(0xFFE53935),
+                            "UR" to Color(0xFF1E88E5),
+                            "ABS" to Color(0xFFFB8C00),
+                            "COM" to Color(0xFF8E24AA),
+                            "Outros" to Color(0xFF757575)
+                        ).forEach { (label, color) ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier.size(8.dp).background(color, CircleShape)
                                 )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -143,6 +321,10 @@ fun ViaturaScreen(
             }
         }
 
+        
+        
+        
+        
         if (showDialog) {
             ModalBottomSheet(
                 onDismissRequest = { showDialog = false },

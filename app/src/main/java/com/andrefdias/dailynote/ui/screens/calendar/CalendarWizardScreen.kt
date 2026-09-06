@@ -54,7 +54,7 @@ fun CalendarWizardScreen(
         topBar = {
             FireTopBar(
                 title = "✨ Configuração de Calendário",
-                onBackClick = onNavigateBack,
+                onBackClick = if (state.isFirstSetup) null else onNavigateBack,
                 backgroundColor = FireColors.Surface
             )
         },

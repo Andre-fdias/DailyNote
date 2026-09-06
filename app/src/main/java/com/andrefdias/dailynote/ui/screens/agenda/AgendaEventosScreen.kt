@@ -72,7 +72,7 @@ fun AgendaEventosScreen(
                 Icon(Icons.Default.Add, contentDescription = "Adicionar Evento")
             }
         },
-        containerColor = Color(0xFF1E2633)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (showAddSheet) {
             EventTaskDetailBottomSheet(
@@ -96,7 +96,7 @@ fun AgendaEventosScreen(
         
         if (eventosSorted.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Nenhum evento encontrado.", color = Color.White.copy(alpha = 0.5f))
+                Text("Nenhum evento encontrado.", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
             }
         } else {
             LazyColumn(
@@ -131,7 +131,7 @@ fun EventoCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White.copy(alpha = 0.05f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable { onClick() }
     ) {
         Row(
@@ -154,13 +154,13 @@ fun EventoCard(
                     text = evento.titulo,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (evento.descricao.isNotBlank()) {
                     Text(
                         text = evento.descricao,
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         maxLines = 1,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -174,19 +174,19 @@ fun EventoCard(
                     if (evento.data.isNotBlank()) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(Icons.Outlined.Event, contentDescription = null, tint = corEvento, modifier = Modifier.size(16.dp))
-                            Text(text = evento.data, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
+                            Text(text = evento.data, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f))
                         }
                     }
                     if (!evento.hora.isNullOrBlank()) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(Icons.Outlined.Schedule, contentDescription = null, tint = corEvento, modifier = Modifier.size(16.dp))
-                            Text(text = evento.hora, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
+                            Text(text = evento.hora, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f))
                         }
                     }
                     if (!evento.local.isNullOrBlank()) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = corEvento, modifier = Modifier.size(16.dp))
-                            Text(text = evento.local, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
+                            Text(text = evento.local, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.9f))
                         }
                     }
                 }

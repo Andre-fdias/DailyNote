@@ -279,8 +279,8 @@ fun EventTaskDetailBottomSheet(
                                 onClick = { isEvent = true },
                                 label = { Text("Evento") },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFFBBDEFB),
-                                    selectedLabelColor = Color(0xFF1565C0)
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             )
                             FilterChip(
@@ -288,8 +288,8 @@ fun EventTaskDetailBottomSheet(
                                 onClick = { isEvent = false },
                                 label = { Text("Tarefa") },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFFBBDEFB),
-                                    selectedLabelColor = Color(0xFF1565C0)
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             )
                         }
@@ -477,7 +477,7 @@ fun EventTaskDetailBottomSheet(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (selectedColor == hexColor) {
-                                        Icon(Icons.Default.Check, contentDescription = "Selecionada", tint = Color.White, modifier = Modifier.size(20.dp))
+                                        Icon(Icons.Default.Check, contentDescription = "Selecionada", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp))
                                     }
                                 }
                             }
@@ -497,7 +497,7 @@ fun EventTaskDetailBottomSheet(
                                 }
                                 onDismiss()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             enabled = title.isNotBlank() && date.isNotBlank()
                         ) {
                             Text("Salvar")

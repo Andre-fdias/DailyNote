@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -78,7 +79,7 @@ fun AgendaCalendarioScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
-                    titleContentColor = Color.White
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
@@ -90,15 +91,15 @@ fun AgendaCalendarioScreen(
                         tarefaSelecionada = null
                         showAddSheet = true 
                     },
-                    containerColor = Color(0xFF1E88E5), // Blue FAB
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Adicionar")
                 }
             }
         },
-        containerColor = Color(0xFF131722)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (showAddSheet) {
             EventTaskDetailBottomSheet(
@@ -130,22 +131,67 @@ fun AgendaCalendarioScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Tabs Row Mock (Dia, Semana, Mês, Agenda)
+            // Filtro de Escala
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    val isSelected = state.selectedEscalaFilter == null
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable { viewModel.setEscalaFilter(null) }
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "Todas",
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                items(state.escalas) { escala ->
+                    val isSelected = state.selectedEscalaFilter == escala.id
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable { viewModel.setEscalaFilter(escala.id) }
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = escala.nome,
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // Tabs Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(Color(0xFF1E2633), RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
                     .padding(4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 listOf("Dia", "Semana", "Mês", "Agenda").forEach { tab ->
                     val isSelected = tab == selectedTab
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (isSelected) Color(0xFF90CAF9).copy(alpha=0.2f) else Color.Transparent)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
                             .clickable { selectedTab = tab }
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
@@ -154,7 +200,7 @@ fun AgendaCalendarioScreen(
                             text = tab,
                             fontSize = 13.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) Color(0xFF90CAF9) else Color.White.copy(alpha = 0.6f)
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -190,8 +236,8 @@ fun AgendaCalendarioScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFF1E2633))
-                            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
                     ) {
                         HorizontalPager(
                             state = pagerState,
@@ -240,7 +286,7 @@ fun AgendaCalendarioScreen(
                             item {
                                 Text(
                                     text = monthYear,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
                                     modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
@@ -269,7 +315,7 @@ fun AgendaCalendarioScreen(
                         if (allItems.isEmpty()) {
                             item {
                                 Box(modifier = Modifier.fillMaxSize().padding(top = 40.dp), contentAlignment = Alignment.Center) {
-                                    Text("Nenhum evento ou tarefa cadastrado.", color = Color.White.copy(alpha = 0.5f))
+                                    Text("Nenhum evento ou tarefa cadastrado.", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
                                 }
                             }
                         }
@@ -285,10 +331,10 @@ fun AgendaCalendarioScreen(
                         }
                     }
                     Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp)) {
-                        Text("Eventos de ${state.selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(bottom = 16.dp))
+                        Text("Eventos de ${state.selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(bottom = 16.dp))
                         if (allItems.isEmpty()) {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Agenda livre neste dia.", color = Color.White.copy(alpha = 0.5f))
+                                Text("Agenda livre neste dia.", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
                             }
                         } else {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -299,12 +345,9 @@ fun AgendaCalendarioScreen(
                                         else -> ""
                                     }
                                     Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-                                        Column(
-                                            modifier = Modifier.width(60.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Text(text = time, color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                                            Box(modifier = Modifier.width(2.dp).fillMaxHeight().background(Color.White.copy(alpha=0.1f)).padding(vertical = 4.dp))
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(60.dp)) {
+                                            Text(text = time, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                            Box(modifier = Modifier.width(2.dp).fillMaxHeight().background(MaterialTheme.colorScheme.onBackground.copy(alpha=0.1f)).padding(vertical = 4.dp))
                                         }
                                         Box(modifier = Modifier.weight(1f).padding(bottom = 16.dp)) {
                                             when(item) {
@@ -331,12 +374,12 @@ fun AgendaCalendarioScreen(
                     }
                 }
                 "Semana" -> {
-                    val startOfWeek = state.selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+                    val weekStart = state.selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
                     
                     Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
                         Text(
-                            "Semana: ${startOfWeek.format(DateTimeFormatter.ofPattern("dd/MM"))} a ${startOfWeek.plusDays(6).format(DateTimeFormatter.ofPattern("dd/MM"))}", 
-                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            text = "Semana de ${weekStart.format(DateTimeFormatter.ofPattern("dd/MM"))}",
+                            color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                         )
                         androidx.compose.foundation.lazy.LazyRow(
                             modifier = Modifier.fillMaxSize(),
@@ -344,7 +387,7 @@ fun AgendaCalendarioScreen(
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(7) { dayOffset ->
-                                val currentDay = startOfWeek.plusDays(dayOffset.toLong())
+                                val currentDay = weekStart.plusDays(dayOffset.toLong())
                                 val dateStr = currentDay.format(DateTimeFormatter.ISO_LOCAL_DATE)
                                 val dayItems = (state.todosEventos.filter { it.data == dateStr } + state.todasTarefas.filter { it.data == dateStr }).sortedBy {
                                     when(it) {
@@ -354,47 +397,51 @@ fun AgendaCalendarioScreen(
                                     }
                                 }
                                 
-                                val diaDaSemana = currentDay.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale("pt", "BR"))
-                                val diaFormatado = currentDay.format(DateTimeFormatter.ofPattern("dd/MM"))
-                                
-                                Column(
+                                Box(
                                     modifier = Modifier
                                         .width(280.dp)
                                         .fillMaxHeight()
+                                        .padding(bottom = 8.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(Color(0xFF1E2633))
-                                        .border(1.dp, Color.White.copy(alpha=0.05f), RoundedCornerShape(12.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.1f), RoundedCornerShape(12.dp))
+                                        .clickable { viewModel.selectDate(currentDay); selectedTab = "Dia" }
                                         .padding(12.dp)
                                 ) {
-                                    Text(
-                                        text = "${diaDaSemana.uppercase()} - $diaFormatado",
-                                        color = if (currentDay == LocalDate.now()) Color(0xFF90CAF9) else Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(bottom = 12.dp)
-                                    )
+                                    val diaDaSemana = currentDay.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale("pt", "BR"))
+                                    val diaFormatado = currentDay.format(DateTimeFormatter.ofPattern("dd/MM"))
                                     
-                                    if (dayItems.isEmpty()) {
-                                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                            Text("Livre", color = Color.White.copy(alpha = 0.3f))
-                                        }
-                                    } else {
-                                        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            items(dayItems) { item ->
-                                                when(item) {
-                                                    is com.andrefdias.dailynote.domain.model.CalendarEvento -> EventoCard(evento = item, onClick = {
-                                                        eventoSelecionado = item
-                                                        tarefaSelecionada = null
-                                                        showAddSheet = true
-                                                    })
-                                                    is com.andrefdias.dailynote.domain.model.CalendarTarefa -> TarefaCard(
-                                                        tarefa = item, 
-                                                        onToggle = { viewModel.toggleTarefaStatus(item) },
-                                                        onClick = {
-                                                            tarefaSelecionada = item
-                                                            eventoSelecionado = null
+                                    Column(modifier = Modifier.fillMaxSize()) {
+                                        Text(
+                                            text = "${diaDaSemana.uppercase()} - $diaFormatado",
+                                            color = if (currentDay == LocalDate.now()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(bottom = 12.dp)
+                                        )
+                                        
+                                        if (dayItems.isEmpty()) {
+                                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                                Text("Livre", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                                            }
+                                        } else {
+                                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                items(dayItems) { item ->
+                                                    when(item) {
+                                                        is com.andrefdias.dailynote.domain.model.CalendarEvento -> EventoCard(evento = item, onClick = {
+                                                            eventoSelecionado = item
+                                                            tarefaSelecionada = null
                                                             showAddSheet = true
-                                                        }
-                                                    )
+                                                        })
+                                                        is com.andrefdias.dailynote.domain.model.CalendarTarefa -> TarefaCard(
+                                                            tarefa = item, 
+                                                            onToggle = { viewModel.toggleTarefaStatus(item) },
+                                                            onClick = {
+                                                                tarefaSelecionada = item
+                                                                eventoSelecionado = null
+                                                                showAddSheet = true
+                                                            }
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -431,7 +478,7 @@ fun CalendarDynamicHeader(
             text = "$monthName $year",
             fontSize = 22.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -439,22 +486,22 @@ fun CalendarDynamicHeader(
                 onClick = onPreviousMonth,
                 modifier = Modifier.size(32.dp)
             ) {
-                Icon(Icons.Default.ChevronLeft, contentDescription = "Anterior", tint = Color.White)
+                Icon(Icons.Default.ChevronLeft, contentDescription = "Anterior", tint = MaterialTheme.colorScheme.onBackground)
             }
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(6.dp))
-                    .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f), RoundedCornerShape(6.dp))
                     .clickable { onToday() }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
-                Text("Hoje", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Hoje", color = MaterialTheme.colorScheme.onBackground, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
             IconButton(
                 onClick = onNextMonth,
                 modifier = Modifier.size(32.dp)
             ) {
-                Icon(Icons.Default.ChevronRight, contentDescription = "Próximo", tint = Color.White)
+                Icon(Icons.Default.ChevronRight, contentDescription = "Próximo", tint = MaterialTheme.colorScheme.onBackground)
             }
         }
     }
@@ -481,14 +528,14 @@ fun CalendarPremiumGrid(
                     text = day,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center
                 )
             }
         }
         
-        Divider(color = Color.White.copy(alpha = 0.05f))
+        Divider(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
 
         var currentDay = 1
         var weekCount = 0
@@ -498,13 +545,13 @@ fun CalendarPremiumGrid(
                 for (i in 0..6) {
                     if (weekCount == 0 && i < firstDayOffset) {
                         // Empty cell
-                        Box(modifier = Modifier.weight(1f).height(100.dp).border(0.5.dp, Color.White.copy(alpha = 0.02f))) {
+                        Box(modifier = Modifier.weight(1f).height(100.dp).border(0.5.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))) {
                             val previousMonth = currentMonth.minusMonths(1)
                             val dayNum = previousMonth.lengthOfMonth() - firstDayOffset + 1 + i
                             Text(
                                 text = dayNum.toString(),
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.2f),
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
                                 modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp)
                             )
                         }
@@ -522,12 +569,12 @@ fun CalendarPremiumGrid(
                         currentDay++
                     } else {
                         // Empty cell
-                        Box(modifier = Modifier.weight(1f).height(100.dp).border(0.5.dp, Color.White.copy(alpha = 0.02f))) {
+                        Box(modifier = Modifier.weight(1f).height(100.dp).border(0.5.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))) {
                             val dayNum = currentDay - daysInMonth
                             Text(
                                 text = dayNum.toString(),
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.2f),
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
                                 modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp)
                             )
                             currentDay++
@@ -567,8 +614,8 @@ fun CalendarPremiumCell(
         modifier = modifier
             .height(100.dp) // Taller cell as requested
             .zIndex(if (isSelected) 1f else 0f)
-            .border(0.5.dp, Color.White.copy(alpha = 0.05f))
-            .background(if (isSelected) Color(0xFF283546) else Color.Transparent)
+            .border(0.5.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+            .background(if (isSelected) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent)
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() }
@@ -591,7 +638,7 @@ fun CalendarPremiumCell(
                         text = equipe.nome,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White // Keep white for team badge text
                     )
                 }
             } else {
@@ -603,10 +650,10 @@ fun CalendarPremiumCell(
                 text = date.dayOfMonth.toString(),
                 fontSize = 13.sp,
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                color = if (isToday) Color(0xFF90CAF9) else Color.White.copy(alpha = 0.9f),
+                color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
                 modifier = Modifier
                     .padding(start = 4.dp, top = 2.dp)
-                    .background(if(isToday) Color(0xFF90CAF9).copy(alpha=0.2f) else Color.Transparent, CircleShape)
+                    .background(if(isToday) MaterialTheme.colorScheme.primaryContainer else Color.Transparent, CircleShape)
                     .padding(horizontal = 6.dp, vertical = 2.dp)
             )
 
@@ -617,7 +664,7 @@ fun CalendarPremiumCell(
                     Text(
                         text = "• $title",
                         fontSize = 9.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -630,7 +677,7 @@ fun CalendarPremiumCell(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .border(2.dp, Color(0xFF90CAF9))
+                    .border(2.dp, MaterialTheme.colorScheme.primary)
             )
         }
     }
@@ -642,6 +689,6 @@ fun CalendarPremiumCell(
 fun LegendItem(label: String, color: Color) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
-        Text(label, fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f))
+        Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f))
     }
 }

@@ -13,6 +13,7 @@ sealed class Screen(
     val showInBottomBar: Boolean = false
 ) {
     // --- MAIN ROOTS ---
+    object Splash : Screen(route = "splash", title = "Splash")
     object Home : Screen(route = "home", title = "Início", icon = Icons.Outlined.Home, selectedIcon = Icons.Filled.Home, showInBottomBar = true)
     object AgendaRoot : Screen(route = "agenda_root", title = "Agenda", icon = Icons.Outlined.CalendarToday, selectedIcon = Icons.Filled.CalendarToday, showInBottomBar = true)
     object MapaForcaRoot : Screen(route = "mapa_forca_root", title = "Mapa Força", icon = Icons.Outlined.Map, selectedIcon = Icons.Filled.Map, showInBottomBar = true)
@@ -36,7 +37,14 @@ sealed class Screen(
     object ResumoOperacional : Screen("resumo_operacional", "Resumo Operacional", Icons.Outlined.Description, Icons.Filled.Description, false)
 
     // --- OCORRENCIAS CONTEXT ---
-    object OcorrenciasEmConstrucao : Screen("ocorrencias_em_construcao", "Em Construção", Icons.Outlined.Construction, Icons.Filled.Construction, false)
+    object OcorrenciasDashboard : Screen("ocorrencias_dashboard", "Dashboard", Icons.Outlined.Dashboard, Icons.Filled.Dashboard, true)
+    object OcorrenciasNova : Screen("ocorrencias_nova", "Nova Ocorrência", Icons.Outlined.AddCircle, Icons.Filled.AddCircle, true)
+    object OcorrenciasConsultar : Screen("ocorrencias_consultar", "Consultar", Icons.Outlined.Search, Icons.Filled.Search, true)
+    object OcorrenciasOpcoes : Screen("ocorrencias_opcoes/{talao}", "Opções", Icons.Outlined.List, Icons.Filled.List, false) {
+        fun createRoute(talao: String) = "ocorrencias_opcoes/$talao"
+    }
+
+    object Relatorios : Screen("relatorios", "Relatórios", Icons.Outlined.Analytics, Icons.Filled.Analytics, false)
 
     // --- CONFIG CONTEXT (e misc) ---
     object SettingsCalendar : Screen("settings_calendar", "Configuração de Calendário", Icons.Outlined.Settings, Icons.Filled.Settings, false)

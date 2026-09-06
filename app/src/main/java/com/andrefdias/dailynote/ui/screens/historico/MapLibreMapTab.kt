@@ -184,7 +184,6 @@ fun MapLibreMapTab(ocorrencias: List<MapOccurrence>) {
                         val label = when(mode) {
                             VisualizationMode.CLUSTERS -> "Grupos"
                             VisualizationMode.MARKERS -> "Pinos"
-                            VisualizationMode.HEATMAP -> "Calor"
                         }
                         androidx.compose.material3.DropdownMenuItem(
                             text = { Text(label, color = if (visMode == mode) MaterialTheme.colorScheme.tertiary else Color.White) },
@@ -409,42 +408,6 @@ private fun updateMarkers(map: MapLibreMap, style: Style, ocorrencias: List<MapO
             unclusteredText.setFilter(org.maplibre.android.style.expressions.Expression.not(org.maplibre.android.style.expressions.Expression.has("point_count")))
         }
         style.addLayer(unclusteredText)
-    }
-
-    if (visMode == VisualizationMode.HEATMAP) {
-        val heatmapLayer = org.maplibre.android.style.layers.HeatmapLayer("heatmap-layer", sourceId)
-        heatmapLayer.setProperties(
-            org.maplibre.android.style.layers.PropertyFactory.heatmapColor(
-                org.maplibre.android.style.expressions.Expression.interpolate(
-                    org.maplibre.android.style.expressions.Expression.linear(),
-                    org.maplibre.android.style.expressions.Expression.heatmapDensity(),
-                    org.maplibre.android.style.expressions.Expression.literal(0), org.maplibre.android.style.expressions.Expression.rgba(33, 102, 172, 0),
-                    org.maplibre.android.style.expressions.Expression.literal(0.2), org.maplibre.android.style.expressions.Expression.rgb(103, 169, 207),
-                    org.maplibre.android.style.expressions.Expression.literal(0.4), org.maplibre.android.style.expressions.Expression.rgb(209, 229, 240),
-                    org.maplibre.android.style.expressions.Expression.literal(0.6), org.maplibre.android.style.expressions.Expression.rgb(253, 219, 199),
-                    org.maplibre.android.style.expressions.Expression.literal(0.8), org.maplibre.android.style.expressions.Expression.rgb(239, 138, 98),
-                    org.maplibre.android.style.expressions.Expression.literal(1), org.maplibre.android.style.expressions.Expression.rgb(178, 24, 43)
-                )
-            ),
-            org.maplibre.android.style.layers.PropertyFactory.heatmapRadius(
-                org.maplibre.android.style.expressions.Expression.interpolate(
-                    org.maplibre.android.style.expressions.Expression.linear(),
-                    org.maplibre.android.style.expressions.Expression.zoom(),
-                    org.maplibre.android.style.expressions.Expression.literal(1), org.maplibre.android.style.expressions.Expression.literal(10),
-                    org.maplibre.android.style.expressions.Expression.literal(15), org.maplibre.android.style.expressions.Expression.literal(30)
-                )
-            ),
-            org.maplibre.android.style.layers.PropertyFactory.heatmapOpacity(0.8f),
-            org.maplibre.android.style.layers.PropertyFactory.heatmapIntensity(
-                org.maplibre.android.style.expressions.Expression.interpolate(
-                    org.maplibre.android.style.expressions.Expression.linear(),
-                    org.maplibre.android.style.expressions.Expression.zoom(),
-                    org.maplibre.android.style.expressions.Expression.literal(1), org.maplibre.android.style.expressions.Expression.literal(1),
-                    org.maplibre.android.style.expressions.Expression.literal(15), org.maplibre.android.style.expressions.Expression.literal(3)
-                )
-            )
-        )
-        style.addLayer(heatmapLayer)
     }
 
     if (features.isNotEmpty()) {

@@ -26,6 +26,7 @@ data class WizardUiState(
     val previewDays: Map<LocalDate, Map<Int, List<EquipeConfig>>> = emptyMap(),
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
+    val isFirstSetup: Boolean = false,
     val error: String? = null
 )
 
@@ -41,6 +42,12 @@ class CalendarWizardViewModel @Inject constructor(
     private val editEscalaId: String? = savedStateHandle.get<String>("escalaId")
 
     init {
+        viewModelScope.launch {
+            val settings = calendarRepository.getSettings().getOrNull()
+            if (settings != null && !settings.calendarioConfigurado) {
+                _uiState.update { it.copy(isFirstSetup = true) }
+            }
+        }
         if (editEscalaId != null) {
             loadExistingEscala(editEscalaId)
         } else {

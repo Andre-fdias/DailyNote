@@ -24,9 +24,13 @@ import kotlinx.coroutines.launch
         RoomEquipeServico::class,
         RoomEquipeViatura::class,
         RoomConfiguracao::class,
-        RoomBackupLog::class
+        RoomBackupLog::class,
+        RoomNovaOcorrencia::class,
+        RoomNovaVitima::class,
+        RoomNovoVeiculo::class,
+        RoomOcorrencia::class
     ],
-    version = 8,
+    version = 16,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -37,6 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun militarDao(): com.andrefdias.dailynote.data.local.dao.MilitarDao
     abstract fun equipeServicoDao(): com.andrefdias.dailynote.data.local.dao.EquipeServicoDao
     abstract fun configuracaoDao(): com.andrefdias.dailynote.data.local.dao.ConfiguracaoDao
+    abstract fun ocorrenciaDao(): com.andrefdias.dailynote.data.local.dao.OcorrenciaDao
 
     companion object {
         @Volatile
@@ -72,6 +77,66 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_8_9 = object : androidx.room.migration.Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `nova_ocorrencias` (`id` TEXT NOT NULL, `talao` TEXT NOT NULL, `data` TEXT NOT NULL, `hora` TEXT NOT NULL, `equipe` TEXT NOT NULL, `natureza` TEXT NOT NULL, `viatura` TEXT NOT NULL, `guarnicaoJson` TEXT NOT NULL, `latitude` REAL, `longitude` REAL, `rua` TEXT, `numero` TEXT, `bairro` TEXT, `cidade` TEXT, `fotosUrisJson` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+            }
+        }
+        
+        val MIGRATION_9_10 = object : androidx.room.migration.Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `nova_vitimas` (`id` TEXT NOT NULL, `ocorrenciaId` TEXT NOT NULL, `nome` TEXT NOT NULL, `idade` INTEGER, `pessoaId` TEXT, `lesoes` TEXT NOT NULL, `lesoesEstruturadasJson` TEXT NOT NULL, `destinoSocorro` TEXT NOT NULL, `quemSocorreu` TEXT NOT NULL, `resultadoOcorrencia` TEXT NOT NULL, `viaturaSocorroId` TEXT, `hospitalDestino` TEXT NOT NULL, `nomeMedico` TEXT NOT NULL, `crmMedico` TEXT NOT NULL, `sinaisVitaisJson` TEXT NOT NULL, `cpf` TEXT, `lesoesAparentes` TEXT, `transportadoPor` TEXT, PRIMARY KEY(`id`))")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `novo_veiculos_envolvidos` (`id` TEXT NOT NULL, `ocorrenciaId` TEXT NOT NULL, `placa` TEXT NOT NULL, `modelo` TEXT NOT NULL, `cor` TEXT NOT NULL, `chassi` TEXT NOT NULL, `anoFabricacao` INTEGER, `anoModelo` INTEGER, `ano` TEXT NOT NULL, `proprietarioId` TEXT, `marca` TEXT NOT NULL, `versao` TEXT NOT NULL, `exercicio` TEXT NOT NULL, `urlCrlv` TEXT, `ocrTextoCrlv` TEXT, `ocrDadosEstruturadosJson` TEXT NOT NULL, `veiculoMasterId` TEXT, `condutorId` TEXT, `dadosMotoristaJson` TEXT, `renavam` TEXT, `monobloco` TEXT, `especie` TEXT, `tipoVeiculo` TEXT, `carroceria` TEXT, `categoriaVeiculo` TEXT, PRIMARY KEY(`id`))")
+            }
+        }
+
+        val MIGRATION_10_11 = object : androidx.room.migration.Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `nova_ocorrencias` ADD COLUMN `pessoasJson` TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+        val MIGRATION_11_12 = object : androidx.room.migration.Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `nova_ocorrencias` ADD COLUMN `historico` TEXT")
+            }
+        }
+        val MIGRATION_12_13 = object : androidx.room.migration.Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `nova_ocorrencias` ADD COLUMN `apoios` TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+        val MIGRATION_13_14 = object : androidx.room.migration.Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `novo_veiculos_envolvidos` ADD COLUMN `fotosVeiculoUrisJson` TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+        
+        val MIGRATION_14_15 = object : androidx.room.migration.Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `ocorrencias` (
+                        `id` TEXT NOT NULL, 
+                        `protocolo` TEXT NOT NULL, 
+                        `natureza` TEXT NOT NULL, 
+                        `latitude` REAL, 
+                        `longitude` REAL, 
+                        `dataHora` TEXT NOT NULL, 
+                        `historico` TEXT, 
+                        `fotos` TEXT NOT NULL, 
+                        `status` TEXT NOT NULL, 
+                        PRIMARY KEY(`id`)
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_ocorrencias_protocolo` ON `ocorrencias` (`protocolo`)")
+            }
+        }
+
+        val MIGRATION_15_16 = object : androidx.room.migration.Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `nova_ocorrencias` ADD COLUMN `isConcluida` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -85,8 +150,8 @@ abstract class AppDatabase : RoomDatabase() {
                         isCreatedJustNow = true
                     }
                 })
-                .addMigrations(MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
-                .fallbackToDestructiveMigration()
+                .addMigrations(MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16)
+                .fallbackToDestructiveMigration(true)
                 .build()
                 
                 INSTANCE = instance
