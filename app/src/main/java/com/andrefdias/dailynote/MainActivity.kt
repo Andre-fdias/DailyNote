@@ -37,7 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.andrefdias.dailynote.domain.calendar.GoogleCalendarSyncManager
 import com.andrefdias.dailynote.domain.calendar.NotificationCenter
-import com.andrefdias.dailynote.ui.designsystem.theme.FireNotesTheme
+import com.andrefdias.dailynote.ui.designsystem.theme.DailyNoteTheme
 import com.andrefdias.dailynote.ui.navigation.Screen
 import com.andrefdias.dailynote.ui.screens.calendar.CalendarViewModel
 import com.andrefdias.dailynote.ui.screens.calendar.CalendarWizardScreen
@@ -208,7 +208,7 @@ class MainActivity : FragmentActivity() {
                 }
             }
 
-            FireNotesTheme(darkTheme = isDarkTheme) {
+            DailyNoteTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
                 
                 val pendingIntent by pendingWidgetAction.collectAsState()
@@ -521,7 +521,7 @@ class MainActivity : FragmentActivity() {
                     }
                 }
                 } // Fechamento do Box
-            } // Fechamento do FireNotesTheme
+            } // Fechamento do DailyNoteTheme
         } // Fechamento do setContent
     }
     

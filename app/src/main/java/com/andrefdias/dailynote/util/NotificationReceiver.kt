@@ -21,7 +21,7 @@ class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         try {
             android.util.Log.d("NotificationReceiver", "Alarm fired! Received broadcast.")
-            val title = intent.getStringExtra("title") ?: "Compromisso FireNotes"
+            val title = intent.getStringExtra("title") ?: "Compromisso DailyNote"
             val text = intent.getStringExtra("text") ?: "Voce tem uma atividade agendada"
             val notificationId = intent.getIntExtra("id", 1001)
 

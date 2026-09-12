@@ -224,7 +224,7 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         // Disparo normal de alarme agendado
-        val titulo = intent.getStringExtra("EXTRA_TITLE") ?: "Lembrete FireNotes"
+        val titulo = intent.getStringExtra("EXTRA_TITLE") ?: "Lembrete DailyNote"
         val descricao = intent.getStringExtra("EXTRA_DESC") ?: ""
         val catName = intent.getStringExtra("EXTRA_CAT") ?: CategoriaNotificacao.SISTEMA.name
         val categoria = runCatching { CategoriaNotificacao.valueOf(catName) }.getOrDefault(CategoriaNotificacao.SISTEMA)

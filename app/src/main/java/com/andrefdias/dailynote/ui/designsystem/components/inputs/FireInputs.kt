@@ -504,7 +504,7 @@ fun FireSearchableDropdownPremium(
                 }
             }
         } catch (e: Exception) {
-            android.util.Log.e("FireNotes", "NatureDropdown error filtering: ${e.message}", e)
+            android.util.Log.e("DailyNote", "NatureDropdown error filtering: ${e.message}", e)
             emptyList()
         }
     }
