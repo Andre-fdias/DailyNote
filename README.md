@@ -112,6 +112,11 @@ O backup é **completo** e inclui:
 - ✅ Arquivos internos (fotos, documentos)
 - ✅ Arquivos externos do app (mídias)
 
+### Diretório e Retenção
+- Os arquivos de backup são salvos na pasta **`DailyNotes/Backup`** no seu Google Drive.
+- O sistema mantém um **limite de 3 arquivos de backup**.
+- Ao gerar um quarto backup, o arquivo mais antigo é automaticamente excluído.
+
 ### Backup Manual
 Configurações → Backup → **Fazer Backup Agora**  
 Exibe barra de progresso em tempo real via notificação Android.

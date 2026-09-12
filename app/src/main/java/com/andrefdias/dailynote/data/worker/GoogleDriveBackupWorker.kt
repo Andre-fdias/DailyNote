@@ -43,7 +43,7 @@ class GoogleDriveBackupWorker @AssistedInject constructor(
             val token = GoogleAuthUtil.getToken(
                 appContext,
                 account.account ?: throw IllegalStateException("Conta sem e-mail do sistema"),
-                "oauth2:https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
+                "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
             )
 
             googleDriveBackupService.uploadBackupToDrive(token) { progress, status ->

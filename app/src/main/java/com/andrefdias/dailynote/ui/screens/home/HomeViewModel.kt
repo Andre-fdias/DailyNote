@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -224,7 +225,12 @@ class HomeViewModel @Inject constructor(
                 }
                 
                 novidades
-            }.collect {
+            }
+            .catch { e ->
+                com.andrefdias.dailynote.util.LogHelper.e(TAG, "Erro ao combinar efetivo: ${e.localizedMessage}", e)
+                _novidadesEfetivo.value = listOf(NovidadeEfetivo("Erro", "Falha ao sincronizar dados do Efetivo."))
+            }
+            .collect {
                 _novidadesEfetivo.value = it
             }
         }
@@ -560,7 +566,12 @@ class HomeViewModel @Inject constructor(
                 .filter { it.data == hoje.toString() && it.categoria == CategoriaNotificacao.EFETIVO }
                 .map { it.titulo }.toSet()
 
-            val efetivos = efetivoRepository.getEfetivo().first()
+            val efetivos = try {
+                efetivoRepository.getEfetivo().first()
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao obter efetivo para alertas: ${e.localizedMessage}")
+                emptyList()
+            }
             Log.d(TAG, "👮 Efetivos para checar: ${efetivos.size}")
 
             efetivos.forEach { militar ->

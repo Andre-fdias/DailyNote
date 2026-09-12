@@ -33,7 +33,7 @@ class GoogleSheetsService @Inject constructor(
             val token = GoogleAuthUtil.getToken(
                 context,
                 account.account!!,
-                "oauth2:https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
+                "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
             )
 
             api.getSpreadsheetValues(

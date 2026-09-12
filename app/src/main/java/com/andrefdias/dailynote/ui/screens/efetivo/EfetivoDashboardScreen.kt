@@ -95,7 +95,7 @@ fun EfetivoDashboardScreen(
                         val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
                             .requestEmail()
                             .requestScopes(
-                                com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/drive.appdata"),
+                                com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/drive.file"),
                                 com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/calendar.events"),
                                 com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/spreadsheets.readonly")
                             )

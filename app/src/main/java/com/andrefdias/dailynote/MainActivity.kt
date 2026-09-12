@@ -186,6 +186,9 @@ class MainActivity : FragmentActivity() {
             val isLoaded = pinEnabled != null && biometricEnabled != null
             val needsAuth = (pinEnabled == true) || (biometricEnabled == true)
             
+            // Controle da Splash Screen
+            var showSplash by remember { mutableStateOf(true) }
+            
             LaunchedEffect(isLoaded, needsAuth) {
                 if (isLoaded && !needsAuth) {
                     isAuthenticated = true
@@ -497,8 +500,14 @@ class MainActivity : FragmentActivity() {
                     } // Fechamento do NavHost
                 } // Fechamento do Scaffold innerPadding
 
-                // Overlay Loading ou AuthScreen por cima de tudo para não destruir o NavHost
-                if (!isLoaded) {
+                // Overlay Splash / Loading / AuthScreen por cima de tudo para não destruir o NavHost
+                if (showSplash) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        com.andrefdias.dailynote.ui.screens.splash.FireSplashScreen(
+                            onAnimationComplete = { showSplash = false }
+                        )
+                    }
+                } else if (!isLoaded) {
                     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {}
                 } else if (!isAuthenticated && needsAuth) {
                     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

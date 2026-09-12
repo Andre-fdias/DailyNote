@@ -56,10 +56,10 @@ Executa automaticamente conforme a frequência configurada:
 
 ## Armazenamento no Google Drive
 
-Os backups são salvos na pasta privada `appDataFolder` do Google Drive:
-- **Não visível** no Drive do usuário
-- **Não acessível** por outros aplicativos
-- **Gratuito** — não consome cota do Drive pessoal do usuário
+Os backups são salvos na pasta **`DailyNotes/Backup`** do seu Google Drive.
+- O sistema mantém um **limite de 3 arquivos de backup**.
+- Ao gerar um quarto backup, o arquivo mais antigo é automaticamente excluído.
+- Isso garante o armazenamento das cópias de segurança de forma organizada sem ocupar muito espaço do seu Drive pessoal.
 
 ## Histórico de Backups
 

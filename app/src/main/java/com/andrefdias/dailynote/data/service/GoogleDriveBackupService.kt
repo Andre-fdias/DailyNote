@@ -12,8 +12,11 @@ import com.google.android.gms.common.api.Scope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.*
@@ -72,7 +75,7 @@ class GoogleDriveBackupService @Inject constructor(
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestScopes(
-                Scope("https://www.googleapis.com/auth/drive.appdata"),
+                Scope("https://www.googleapis.com/auth/drive.file"),
                 Scope("https://www.googleapis.com/auth/calendar.events"),
                 Scope("https://www.googleapis.com/auth/spreadsheets.readonly")
             )
@@ -165,8 +168,12 @@ class GoogleDriveBackupService @Inject constructor(
             }.getOrThrow()
             android.util.Log.d("DailyBackup", "ZIP criado: ${tempZipFile.length()} bytes em ${tempZipFile.absolutePath}")
 
+            onProgress?.invoke(0, "Preparando pastas...")
+            val dailyNotesFolderId = getOrCreateFolder(accessToken, "DailyNotes")
+            val backupFolderId = getOrCreateFolder(accessToken, "Backup", dailyNotesFolderId)
+
             onProgress?.invoke(0, "Enviando...")
-            val metadataJson = """{"name":"$backupFileName","parents":["appDataFolder"]}"""
+            val metadataJson = """{"name":"$backupFileName","parents":["$backupFolderId"]}"""
             android.util.Log.d("DailyBackup", "Metadata: $metadataJson")
 
             // Construir multipart/related com boundary explícito
@@ -218,6 +225,11 @@ class GoogleDriveBackupService @Inject constructor(
             }
 
             tempZipFile.delete()
+            
+            // Clean up old backups, keep only 3
+            onProgress?.invoke(95, "Limpando backups antigos...")
+            cleanOldBackups(accessToken, backupFolderId)
+
             onProgress?.invoke(100, "Concluído!")
 
             val log = RoomBackupLog(
@@ -245,7 +257,11 @@ class GoogleDriveBackupService @Inject constructor(
 
     suspend fun listBackupsFromDrive(accessToken: String): Result<List<DriveFile>> = withContext(Dispatchers.IO) {
         runCatching {
-            val url = "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name,size,createdTime)&orderBy=createdTime%20desc"
+            val dailyNotesFolderId = getOrCreateFolder(accessToken, "DailyNotes")
+            val backupFolderId = getOrCreateFolder(accessToken, "Backup", dailyNotesFolderId)
+            
+            val q = "'$backupFolderId' in parents and trashed=false"
+            val url = "https://www.googleapis.com/drive/v3/files?q=${java.net.URLEncoder.encode(q, "UTF-8")}&fields=files(id,name,size,createdTime)&orderBy=createdTime%20desc"
             val request = Request.Builder()
                 .url(url)
                 .header("Authorization", "Bearer $accessToken")
@@ -369,6 +385,79 @@ class GoogleDriveBackupService @Inject constructor(
             if (shouldBackup) {
                 uploadBackupToDrive(accessToken).getOrThrow()
             } else null
+        }
+    }
+
+    private fun getOrCreateFolder(accessToken: String, folderName: String, parentId: String? = null): String {
+        var q = "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false"
+        if (parentId != null) {
+            q += " and '$parentId' in parents"
+        }
+        val url = "https://www.googleapis.com/drive/v3/files?q=${java.net.URLEncoder.encode(q, "UTF-8")}&fields=files(id)"
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $accessToken")
+            .get()
+            .build()
+            
+        httpClient.newCall(request).execute().use { response ->
+            if (response.isSuccessful) {
+                val jsonResponse = JSONObject(response.body?.string() ?: "{}")
+                val files = jsonResponse.optJSONArray("files")
+                if (files != null && files.length() > 0) {
+                    return files.getJSONObject(0).getString("id")
+                }
+            }
+        }
+        
+        val metadata = JSONObject()
+        metadata.put("name", folderName)
+        metadata.put("mimeType", "application/vnd.google-apps.folder")
+        if (parentId != null) {
+            metadata.put("parents", org.json.JSONArray().put(parentId))
+        }
+        
+        val createReq = Request.Builder()
+            .url("https://www.googleapis.com/drive/v3/files")
+            .header("Authorization", "Bearer $accessToken")
+            .post(metadata.toString().toRequestBody("application/json; charset=UTF-8".toMediaType()))
+            .build()
+            
+        httpClient.newCall(createReq).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Falha ao criar pasta $folderName: ${response.body?.string()}")
+            val json = JSONObject(response.body?.string() ?: "{}")
+            return json.getString("id")
+        }
+    }
+
+    private fun cleanOldBackups(accessToken: String, folderId: String) {
+        val q = "'$folderId' in parents and trashed=false"
+        val url = "https://www.googleapis.com/drive/v3/files?q=${java.net.URLEncoder.encode(q, "UTF-8")}&fields=files(id,createdTime)&orderBy=createdTime%20asc"
+        
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", "Bearer $accessToken")
+            .get()
+            .build()
+            
+        httpClient.newCall(request).execute().use { response ->
+            if (response.isSuccessful) {
+                val jsonResponse = JSONObject(response.body?.string() ?: "{}")
+                val filesArray = jsonResponse.optJSONArray("files") ?: return
+                
+                if (filesArray.length() > 3) {
+                    val toDeleteCount = filesArray.length() - 3
+                    for (i in 0 until toDeleteCount) {
+                        val fileId = filesArray.getJSONObject(i).getString("id")
+                        val delReq = Request.Builder()
+                            .url("https://www.googleapis.com/drive/v3/files/$fileId")
+                            .header("Authorization", "Bearer $accessToken")
+                            .delete()
+                            .build()
+                        httpClient.newCall(delReq).execute().close()
+                    }
+                }
+            }
         }
     }
 }

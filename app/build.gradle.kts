@@ -1,6 +1,6 @@
-
 import java.util.Properties
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -151,4 +151,35 @@ dependencies {
     // Exportação Excel
     implementation("org.apache.poi:poi:5.2.3")
     implementation("org.apache.poi:poi-ooxml:5.2.3")
+}
+
+tasks.register("bumpVersion") {
+    doLast {
+        val type = project.findProperty("type") as? String ?: "build"
+        val versionPropsFile = rootProject.file("version.properties")
+        val versionProps = Properties()
+        if (versionPropsFile.exists()) {
+            versionProps.load(FileInputStream(versionPropsFile))
+        }
+
+        var major = versionProps["version.major"]?.toString()?.toInt() ?: 1
+        var minor = versionProps["version.minor"]?.toString()?.toInt() ?: 0
+        var patch = versionProps["version.patch"]?.toString()?.toInt() ?: 0
+        var build = versionProps["version.build"]?.toString()?.toInt() ?: 1
+
+        when (type) {
+            "major" -> { major++; minor = 0; patch = 0; build = 1 }
+            "minor" -> { minor++; patch = 0; build = 1 }
+            "patch" -> { patch++; build = 1 }
+            "build" -> { build++ }
+        }
+
+        versionProps["version.major"] = major.toString()
+        versionProps["version.minor"] = minor.toString()
+        versionProps["version.patch"] = patch.toString()
+        versionProps["version.build"] = build.toString()
+
+        versionProps.store(FileOutputStream(versionPropsFile), null)
+        println("Versão atualizada para: $major.$minor.$patch (Build $build)")
+    }
 }

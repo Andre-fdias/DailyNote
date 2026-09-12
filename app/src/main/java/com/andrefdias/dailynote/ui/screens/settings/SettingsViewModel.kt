@@ -248,13 +248,29 @@ class SettingsViewModel @Inject constructor(
             return
         }
 
-        _uiState.update { it.copy(infoMessage = "Backup iniciado em segundo plano. Acompanhe pela barra de notificações.", errorMessage = null) }
-        appendLog("INFO", "Backup manual enfileirado para execução em segundo plano.")
-        
-        val workManager = androidx.work.WorkManager.getInstance(context)
-        val workRequest = androidx.work.OneTimeWorkRequestBuilder<com.andrefdias.dailynote.data.worker.GoogleDriveBackupWorker>()
-            .build()
-        workManager.enqueue(workRequest)
+        viewModelScope.launch {
+            try {
+                // Tenta obter o token. Se precisar de consentimento, vai lançar UserRecoverableAuthException
+                getGoogleAccessToken(account)
+                
+                // Se chegou aqui, já tem permissão
+                _uiState.update { it.copy(infoMessage = "Backup iniciado em segundo plano. Acompanhe pela barra de notificações.", errorMessage = null) }
+                appendLog("INFO", "Backup manual enfileirado para execução em segundo plano.")
+                
+                val workManager = androidx.work.WorkManager.getInstance(context)
+                val workRequest = androidx.work.OneTimeWorkRequestBuilder<com.andrefdias.dailynote.data.worker.GoogleDriveBackupWorker>()
+                    .build()
+                workManager.enqueue(workRequest)
+            } catch (e: com.google.android.gms.auth.UserRecoverableAuthException) {
+                _uiState.update { it.copy(isProcessing = false, authRecoveryIntent = e.intent, errorMessage = "Permissão do Google Drive necessária para fazer backup.") }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                val msg = "Erro de autenticação do Google: ${e.localizedMessage}"
+                _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
+                appendLog("ERROR", msg)
+            }
+        }
     }
 
     fun restoreDriveBackup(fileId: String, onRestored: () -> Unit) {
@@ -295,7 +311,7 @@ class SettingsViewModel @Inject constructor(
         GoogleAuthUtil.getToken(
             context,
             account.account ?: throw IllegalStateException("Conta sem e-mail do sistema"),
-            "oauth2:https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
+            "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
         )
     }
 

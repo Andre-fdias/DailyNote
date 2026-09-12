@@ -34,7 +34,7 @@ class GoogleCalendarSyncManager @Inject constructor(
         com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestScopes(
-                com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/drive.appdata"),
+                com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/drive.file"),
                 com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/calendar.events"),
                 com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/spreadsheets.readonly")
             )
@@ -59,7 +59,7 @@ class GoogleCalendarSyncManager @Inject constructor(
             val token = GoogleAuthUtil.getToken(
                 context,
                 account.account!!,
-                "oauth2:https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
+                "oauth2:https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
             )
             token
         }.onFailure {
