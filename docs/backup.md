@@ -1,6 +1,6 @@
 # Sistema de Backup
 
-O sistema de backup do FireNotes é completo, confiável e funciona tanto manualmente quanto de forma automática em segundo plano.
+O sistema de backup do DailyNote é completo, confiável e funciona tanto manualmente quanto de forma automática em segundo plano.
 
 ## O que é incluído no backup?
 

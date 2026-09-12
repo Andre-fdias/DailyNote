@@ -1,8 +1,6 @@
-<div align="center">
+# 📝 DailyNote
 
-# 🔥 FireNotes
-
-**Sistema de Gestão Operacional para Bombeiros**
+**Sistema de Gestão Pessoal e Operacional**
 
 [![Android](https://img.shields.io/badge/Platform-Android-green.svg?logo=android)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-blue.svg?logo=kotlin)](https://kotlinlang.org)
@@ -12,13 +10,11 @@
 
 [📖 Documentação Completa](https://andre-fdias.github.io/DailyNote) · [🐛 Reportar Bug](https://github.com/Andre-fdias/DailyNote/issues) · [💡 Solicitar Feature](https://github.com/Andre-fdias/DailyNote/issues)
 
-</div>
-
 ---
 
 ## 📋 Sobre o Projeto
 
-**FireNotes** é um aplicativo Android completo desenvolvido para bombeiros e equipes de resposta de emergência. Centraliza toda a gestão operacional do quartel em um único sistema mobile: efetivo, viaturas, ocorrências, escalas de serviço, calendário, e muito mais — funcionando **offline-first** com sincronização opcional via Google Drive.
+**DailyNote** é um aplicativo Android completo desenvolvido para bombeiros e equipes de resposta de emergência. Centraliza toda a gestão operacional do quartel em um único sistema mobile: efetivo, viaturas, ocorrências, escalas de serviço, calendário, e muito mais — funcionando **offline-first** com sincronização opcional via Google Drive.
 
 ### ✨ Principais Funcionalidades
 
@@ -202,8 +198,4 @@ Este é um projeto proprietário para uso interno operacional. Para sugestões o
 
 ---
 
-<div align="center">
-
 **Desenvolvido com ❤️ para o Corpo de Bombeiros**
-
-</div>
