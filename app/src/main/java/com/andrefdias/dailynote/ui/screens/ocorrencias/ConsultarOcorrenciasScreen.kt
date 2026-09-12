@@ -117,6 +117,7 @@ fun ConsultarOcorrenciasScreen(
                             ocorrencia = ocorrencia,
                             viaturaMap = state.viaturaMap,
                             veiculosMap = state.veiculosMap,
+                            vitimasMap = state.vitimasMap,
                             onEditar = { onNavigateToOpcoes(ocorrencia.id) },
                             onExcluir = { viewModel.excluirOcorrencia(ocorrencia) }
                         )
@@ -132,6 +133,7 @@ fun OcorrenciaCard(
     ocorrencia: RoomNovaOcorrencia,
     viaturaMap: Map<String, String>,
     veiculosMap: Map<String, List<com.andrefdias.dailynote.data.local.entities.RoomNovoVeiculo>>,
+    vitimasMap: Map<String, List<com.andrefdias.dailynote.data.local.entities.RoomNovaVitima>>,
     onEditar: () -> Unit,
     onExcluir: () -> Unit
 ) {
@@ -243,13 +245,64 @@ fun OcorrenciaCard(
                     }
                 }
 
-                // Expand toggle
-                IconButton(onClick = { expanded = !expanded }, modifier = Modifier.align(Alignment.CenterVertically)) {
-                    Icon(
-                        if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                // Actions (Expand + Options)
+                Row(modifier = Modifier.align(Alignment.CenterVertically)) {
+                    val context = LocalContext.current
+                    var showDropdown by remember { mutableStateOf(false) }
+
+                    IconButton(onClick = { showDropdown = true }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "Opções", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+
+                    DropdownMenu(
+                        expanded = showDropdown,
+                        onDismissRequest = { showDropdown = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Compartilhar (WhatsApp)") },
+                            onClick = {
+                                showDropdown = false
+                                com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareTextWhatsApp(
+                                    context, ocorrencia, vitimasMap[ocorrencia.id] ?: emptyList(), veiculosMap[ocorrencia.id] ?: emptyList()
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Compartilhar PDF") },
+                            onClick = {
+                                showDropdown = false
+                                com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareReportPdf(
+                                    context, ocorrencia, veiculosMap[ocorrencia.id] ?: emptyList(), vitimasMap[ocorrencia.id] ?: emptyList()
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Compartilhar PDF + Imagens") },
+                            onClick = {
+                                showDropdown = false
+                                com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareReportAndImages(
+                                    context, ocorrencia, veiculosMap[ocorrencia.id] ?: emptyList(), vitimasMap[ocorrencia.id] ?: emptyList()
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Exportar / Sincronizar (JSON)") },
+                            onClick = {
+                                showDropdown = false
+                                com.andrefdias.dailynote.util.OcorrenciaExportHelper.exportToJson(
+                                    context, ocorrencia, veiculosMap[ocorrencia.id] ?: emptyList(), vitimasMap[ocorrencia.id] ?: emptyList()
+                                )
+                            }
+                        )
+                    }
+
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 

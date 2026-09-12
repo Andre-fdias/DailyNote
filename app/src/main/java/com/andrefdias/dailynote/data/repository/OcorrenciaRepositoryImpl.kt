@@ -63,6 +63,20 @@ class OcorrenciaRepositoryImpl @Inject constructor(
         dao.insertOcorrencia(ocorrencia)
     }
 
+    override suspend fun getOcorrenciaById(talao: String): RoomNovaOcorrencia? {
+        return dao.getOcorrenciaById(talao)
+    }
+
+    override suspend fun insertOcorrenciaComDetalhes(
+        ocorrencia: RoomNovaOcorrencia,
+        pacientes: List<com.andrefdias.dailynote.data.local.entities.RoomNovaVitima>,
+        veiculos: List<com.andrefdias.dailynote.data.local.entities.RoomNovoVeiculo>
+    ) {
+        dao.insertOcorrencia(ocorrencia)
+        pacientes.forEach { dao.insertVitima(it) }
+        veiculos.forEach { dao.insertVeiculoEnvolvido(it) }
+    }
+
     override suspend fun updateOcorrenciaLocal(ocorrencia: RoomNovaOcorrencia) {
         dao.updateOcorrencia(ocorrencia)
     }

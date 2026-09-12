@@ -34,6 +34,7 @@ object NotificationCenter {
     const val CHANNEL_BACKUP = "firenotes_backup"
     const val CHANNEL_OCORRENCIAS = "firenotes_ocorrencias"
     const val CHANNEL_TREINAMENTOS = "firenotes_treinamentos"
+    const val CHANNEL_EFETIVO = "firenotes_efetivo"
 
     /**
      * Cria todos os canais de notificação exigidos no Android O+.
@@ -50,7 +51,8 @@ object NotificationCenter {
                 Pair(CHANNEL_SISTEMA, "Sistema"),
                 Pair(CHANNEL_BACKUP, "Backup"),
                 Pair(CHANNEL_OCORRENCIAS, "Ocorrências"),
-                Pair(CHANNEL_TREINAMENTOS, "Treinamentos")
+                Pair(CHANNEL_TREINAMENTOS, "Treinamentos"),
+                Pair(CHANNEL_EFETIVO, "Efetivo")
             )
 
             channels.forEach { (id, name) ->
@@ -153,6 +155,7 @@ object NotificationCenter {
             CategoriaNotificacao.BACKUP -> CHANNEL_BACKUP
             CategoriaNotificacao.OCORRENCIAS -> CHANNEL_OCORRENCIAS
             CategoriaNotificacao.TREINAMENTOS -> CHANNEL_TREINAMENTOS
+            CategoriaNotificacao.EFETIVO -> CHANNEL_EFETIVO
         }
 
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -191,6 +194,7 @@ object NotificationCenter {
             )
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Lida", readPendingIntent)
 
         notificationManager.notify(notificacao.id.hashCode(), builder.build())

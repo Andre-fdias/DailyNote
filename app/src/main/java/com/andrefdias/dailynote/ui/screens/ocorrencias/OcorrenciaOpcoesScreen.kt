@@ -113,47 +113,48 @@ fun OcorrenciaOpcoesScreen(
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Gerar PDF") },
+                                text = { Text("Compartilhar (WhatsApp)") },
                                 onClick = {
                                     expanded = false
                                     ocorrencia?.let { oc ->
-                                        coroutineScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                            val uri = OcorrenciaPdfGenerator.generatePdf(context, oc, veiculos, vitimas)
-                                            if (uri != null) {
-                                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                                    setDataAndType(uri, "application/pdf")
-                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                                }
-                                                try {
-                                                    context.startActivity(Intent.createChooser(intent, "Visualizar PDF"))
-                                                } catch(e: Exception) { e.printStackTrace() }
-                                            }
-                                        }
+                                        com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareTextWhatsApp(
+                                            context, oc, vitimas, veiculos
+                                        )
                                     }
-                                },
-                                leadingIcon = { Icon(Icons.Filled.PictureAsPdf, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+                                }
                             )
                             DropdownMenuItem(
-                                text = { Text("Compartilhar") },
+                                text = { Text("Compartilhar PDF") },
                                 onClick = {
                                     expanded = false
                                     ocorrencia?.let { oc ->
-                                        coroutineScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                            val uri = OcorrenciaPdfGenerator.generatePdf(context, oc, veiculos, vitimas)
-                                            if (uri != null) {
-                                                val intent = Intent(Intent.ACTION_SEND).apply {
-                                                    type = "application/pdf"
-                                                    putExtra(Intent.EXTRA_STREAM, uri)
-                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                                }
-                                                try {
-                                                    context.startActivity(Intent.createChooser(intent, "Compartilhar Relatório"))
-                                                } catch(e: Exception) { e.printStackTrace() }
-                                            }
-                                        }
+                                        com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareReportPdf(
+                                            context, oc, veiculos, vitimas
+                                        )
                                     }
-                                },
-                                leadingIcon = { Icon(Icons.Filled.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Compartilhar PDF + Imagens") },
+                                onClick = {
+                                    expanded = false
+                                    ocorrencia?.let { oc ->
+                                        com.andrefdias.dailynote.util.OcorrenciaExportHelper.shareReportAndImages(
+                                            context, oc, veiculos, vitimas
+                                        )
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Exportar / Sincronizar (JSON)") },
+                                onClick = {
+                                    expanded = false
+                                    ocorrencia?.let { oc ->
+                                        com.andrefdias.dailynote.util.OcorrenciaExportHelper.exportToJson(
+                                            context, oc, veiculos, vitimas
+                                        )
+                                    }
+                                }
                             )
                         }
                     }

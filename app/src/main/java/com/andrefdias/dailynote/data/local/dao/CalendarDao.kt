@@ -68,6 +68,9 @@ interface CalendarDao {
     @Query("SELECT * FROM calendar_eventos WHERE id = :id")
     suspend fun getEventoById(id: String): RoomCalendarEvento?
 
+    @Query("SELECT * FROM calendar_eventos WHERE googleEventId = :googleId LIMIT 1")
+    suspend fun getEventoByGoogleId(googleId: String): RoomCalendarEvento?
+
     @Query("SELECT * FROM calendar_eventos WHERE data = :data ORDER BY hora ASC")
     fun getEventosForDayFlow(data: String): Flow<List<RoomCalendarEvento>>
 

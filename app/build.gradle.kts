@@ -1,4 +1,9 @@
 
+import java.util.Properties
+import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,6 +14,16 @@ plugins {
 }
 
 android {
+    val versionPropsFile = rootProject.file("version.properties")
+    val versionProps = Properties()
+    if (versionPropsFile.exists()) {
+        versionProps.load(FileInputStream(versionPropsFile))
+    }
+    val major = versionProps["version.major"]?.toString()?.toInt() ?: 1
+    val minor = versionProps["version.minor"]?.toString()?.toInt() ?: 0
+    val patch = versionProps["version.patch"]?.toString()?.toInt() ?: 0
+    val build = versionProps["version.build"]?.toString()?.toInt() ?: 1
+
     namespace = "com.andrefdias.dailynote"
     compileSdk = 36
 
@@ -16,8 +31,10 @@ android {
         applicationId = "com.andrefdias.dailynote"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = build
+        versionName = "$major.$minor.$patch"
+
+        buildConfigField("String", "BUILD_TIME", "\"${SimpleDateFormat("dd/MM/yyyy HH:mm").format(Date())}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -77,8 +94,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.patrykandpatrick.vico:compose:1.14.0")
     implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
-    implementation("com.google.maps.android:maps-compose:4.3.3")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    // Osmdroid
     
     // Osmdroid
     implementation("org.osmdroid:osmdroid-android:6.1.20")
@@ -100,10 +116,17 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.play.services.auth)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
+    // Jetpack Glance (Widgets)
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation("androidx.glance:glance-material3:1.1.0")
+    implementation("androidx.hilt:hilt-work:1.2.0")
 
     // Dagger Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp("androidx.hilt:hilt-compiler:1.2.0")
     compileOnly(libs.errorprone.annotations)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)

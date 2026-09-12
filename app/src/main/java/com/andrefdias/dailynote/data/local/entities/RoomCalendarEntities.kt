@@ -60,7 +60,8 @@ data class RoomCalendarEvento(
     val cor: String, // Hex string
     val recorrencia: String, // NUNCA, DIARIA, SEMANAL, MENSAL, ANUAL, PERSONALIZADA
     val lembreteMinutos: Int?,
-    val escalaId: String? = null
+    val escalaId: String? = null,
+    val googleEventId: String? = null
 )
 
 @Entity(tableName = "calendar_tarefas")
@@ -76,7 +77,8 @@ data class RoomCalendarTarefa(
     val responsavel: String?,
     val anexos: String?, // Comma separated list of paths
     val checklistJson: String?, // JSON string
-    val escalaId: String? = null
+    val escalaId: String? = null,
+    val googleEventId: String? = null
 )
 
 @Entity(tableName = "notificacoes_historico")

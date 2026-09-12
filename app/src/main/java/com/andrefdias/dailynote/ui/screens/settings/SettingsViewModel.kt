@@ -32,6 +32,7 @@ data class SettingsUiState(
 
     // Security states
     val pinCode: String = "",
+    val pinInputValue: String = "",
     val pinConfirmValue: String? = null,
     val pinError: String? = null,
     val pinEnabled: Boolean = false,
@@ -49,7 +50,7 @@ class SettingsViewModel @Inject constructor(
     private val configuracaoDao: ConfiguracaoDao,
     val googleDriveBackupService: GoogleDriveBackupService,
     private val settingsRepository: com.andrefdias.dailynote.domain.repository.SettingsRepository,
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -116,7 +117,7 @@ class SettingsViewModel @Inject constructor(
 
     // --- PIN Management ---
     fun updatePinCode(pin: String) {
-        _uiState.update { it.copy(pinCode = pin, pinError = null) }
+        _uiState.update { it.copy(pinInputValue = pin, pinError = null) }
     }
 
     fun updatePinConfirm(pin: String) {
@@ -129,15 +130,15 @@ class SettingsViewModel @Inject constructor(
 
     fun savePin() {
         val state = _uiState.value
-        if (state.pinCode.length != 4) {
+        if (state.pinInputValue.length != 4) {
             _uiState.update { it.copy(pinError = "O PIN deve ter exatamente 4 dígitos.") }
             return
         }
-        if (state.pinCode != state.pinConfirmValue) {
+        if (state.pinInputValue != state.pinConfirmValue) {
             _uiState.update { it.copy(pinError = "Os PINs não coincidem.") }
             return
         }
-        updatePin(state.pinCode, true)
+        updatePin(state.pinInputValue, true)
     }
 
     fun clearPinError() {
@@ -152,6 +153,7 @@ class SettingsViewModel @Inject constructor(
                 it.copy(
                     infoMessage = if (enabled) "PIN de segurança ativado com sucesso." else "PIN desativado.",
                     pinCode = pin,
+                    pinInputValue = "",
                     pinEnabled = enabled,
                     pinConfirmValue = null,
                     pinError = null
@@ -222,12 +224,15 @@ class SettingsViewModel @Inject constructor(
                         appendLog("INFO", "Lista de backups recuperada. Total: ${list.size}")
                     }
                     .onFailure { error ->
+                        if (error is kotlinx.coroutines.CancellationException) throw error
                         val msg = "Falha ao listar backups: ${error.localizedMessage}"
                         _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
                         appendLog("ERROR", msg)
                     }
             } catch (e: com.google.android.gms.auth.UserRecoverableAuthException) {
                 _uiState.update { it.copy(isProcessing = false, authRecoveryIntent = e.intent, errorMessage = "Permissão do Google Drive necessária.") }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 val msg = "Erro de autenticação do Google: ${e.localizedMessage}"
                 _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
@@ -243,60 +248,43 @@ class SettingsViewModel @Inject constructor(
             return
         }
 
-        _uiState.update { it.copy(isProcessing = true, infoMessage = null, errorMessage = null) }
-        viewModelScope.launch {
-            try {
-                val token = getGoogleAccessToken(account)
-                googleDriveBackupService.uploadBackupToDrive(token)
-                    .onSuccess { log ->
-                        val timestamp = java.time.LocalDateTime.now().toString()
-                        _uiState.update {
-                            it.copy(
-                                isProcessing = false,
-                                infoMessage = "Backup enviado para o Drive com sucesso!",
-                                config = it.config.copy(ultimoBackupData = timestamp)
-                            )
-                        }
-                        appendLog("INFO", "Backup enviado para o Drive com sucesso.")
-                    }
-                    .onFailure { error ->
-                        val msg = "Falha ao enviar backup: ${error.localizedMessage}"
-                        _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
-                        appendLog("ERROR", msg)
-                    }
-            } catch (e: com.google.android.gms.auth.UserRecoverableAuthException) {
-                _uiState.update { it.copy(isProcessing = false, authRecoveryIntent = e.intent, errorMessage = "Permissão do Google Drive necessária.") }
-            } catch (e: Exception) {
-                val msg = "Erro ao acessar o Drive: ${e.localizedMessage}"
-                _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
-                appendLog("ERROR", msg)
-            }
-        }
+        _uiState.update { it.copy(infoMessage = "Backup iniciado em segundo plano. Acompanhe pela barra de notificações.", errorMessage = null) }
+        appendLog("INFO", "Backup manual enfileirado para execução em segundo plano.")
+        
+        val workManager = androidx.work.WorkManager.getInstance(context)
+        val workRequest = androidx.work.OneTimeWorkRequestBuilder<com.andrefdias.dailynote.data.worker.GoogleDriveBackupWorker>()
+            .build()
+        workManager.enqueue(workRequest)
     }
 
     fun restoreDriveBackup(fileId: String, onRestored: () -> Unit) {
         val account = googleDriveBackupService.getLastSignedInAccount()
         if (account == null) return
 
-        _uiState.update { it.copy(isProcessing = true, showRestoreDialog = false) }
+        _uiState.update { it.copy(isProcessing = true, showRestoreDialog = false, infoMessage = "Iniciando restauração...") }
         viewModelScope.launch {
             try {
                 val token = getGoogleAccessToken(account)
-                googleDriveBackupService.restoreBackupFromDrive(token, fileId)
+                googleDriveBackupService.restoreBackupFromDrive(token, fileId) { progress, status ->
+                    _uiState.update { it.copy(infoMessage = "$status ($progress%)") }
+                }
                     .onSuccess {
                         _uiState.update { it.copy(isProcessing = false, infoMessage = "Restauração concluída!") }
                         appendLog("INFO", "Backup restaurado com sucesso. (ID: $fileId)")
                         onRestored()
                     }
                     .onFailure { error ->
-                        val msg = "Falha ao restaurar dados: ${error.localizedMessage}"
+                        if (error is kotlinx.coroutines.CancellationException) throw error
+                        val msg = "Falha na restauração: ${error.localizedMessage}"
                         _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
                         appendLog("ERROR", msg)
                     }
             } catch (e: com.google.android.gms.auth.UserRecoverableAuthException) {
                 _uiState.update { it.copy(isProcessing = false, authRecoveryIntent = e.intent, errorMessage = "Permissão do Google Drive necessária.") }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
-                val msg = "Erro de restauração: ${e.localizedMessage}"
+                val msg = "Erro inesperado: ${e.localizedMessage}"
                 _uiState.update { it.copy(isProcessing = false, errorMessage = msg) }
                 appendLog("ERROR", msg)
             }
@@ -307,7 +295,7 @@ class SettingsViewModel @Inject constructor(
         GoogleAuthUtil.getToken(
             context,
             account.account ?: throw IllegalStateException("Conta sem e-mail do sistema"),
-            "oauth2:https://www.googleapis.com/auth/drive.appdata"
+            "oauth2:https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/spreadsheets.readonly"
         )
     }
 
@@ -330,6 +318,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val newConfig = _uiState.value.config.copy(backupAutomatico = frequency)
             configuracaoDao.insertConfiguracao(newConfig)
+            
+            // Re-agendar o Worker
+            com.andrefdias.dailynote.data.worker.BackupScheduler.scheduleNextBackup(
+                context, frequency, newConfig.backupSomenteWifi, forceReplace = true
+            )
+            
             _uiState.update { it.copy(infoMessage = "Frequência de backup atualizada.") }
             appendLog("INFO", "Frequência de backup alterada para $frequency")
         }
@@ -339,6 +333,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val newConfig = _uiState.value.config.copy(backupSomenteWifi = wifiOnly)
             configuracaoDao.insertConfiguracao(newConfig)
+            
+            // Re-agendar o Worker se necessário
+            com.andrefdias.dailynote.data.worker.BackupScheduler.scheduleNextBackup(
+                context, newConfig.backupAutomatico, wifiOnly, forceReplace = true
+            )
+            
             _uiState.update { it.copy(infoMessage = if (wifiOnly) "Backup apenas em Wi-Fi ativado." else "Backup em qualquer rede ativado.") }
         }
     }

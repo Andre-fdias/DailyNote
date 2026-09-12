@@ -282,15 +282,15 @@ fun VitimaFormScreen(
     var saturacao by remember { mutableStateOf(initialSinais["spo2"] ?: "") }
     var respiracao by remember { mutableStateOf(initialSinais["fr"] ?: "") }
     
-    // Glasgow parsing from lesoesEstruturadasJson
-    val initialGlasgow = try {
+    // Glasgow parsing from sinaisVitaisJson (novo padrão) ou lesoesEstruturadasJson (legado)
+    val legacyGlasgow = try {
         val type = object : TypeToken<Map<String, Int>>() {}.type
         gson.fromJson<Map<String, Int>>(vitima?.lesoesEstruturadasJson ?: "{}", type) ?: emptyMap()
     } catch (e: Exception) { emptyMap() }
     
-    var glasgowAO by remember { mutableStateOf(initialGlasgow["ao"] ?: 0) }
-    var glasgowRV by remember { mutableStateOf(initialGlasgow["rv"] ?: 0) }
-    var glasgowRM by remember { mutableStateOf(initialGlasgow["rm"] ?: 0) }
+    var glasgowAO by remember { mutableStateOf(initialSinais["ao"]?.toIntOrNull() ?: legacyGlasgow["ao"] ?: 0) }
+    var glasgowRV by remember { mutableStateOf(initialSinais["rv"]?.toIntOrNull() ?: legacyGlasgow["rv"] ?: 0) }
+    var glasgowRM by remember { mutableStateOf(initialSinais["rm"]?.toIntOrNull() ?: legacyGlasgow["rm"] ?: 0) }
     
     val totalGlasgow = if (glasgowAO > 0 && glasgowRV > 0 && glasgowRM > 0) glasgowAO + glasgowRV + glasgowRM else 0
     
@@ -467,7 +467,7 @@ fun VitimaFormScreen(
                             bodyPoints.forEach { point ->
                                 AssistChip(
                                     onClick = {},
-                                    label = { Text(point.tipo, color = MaterialTheme.colorScheme.onErrorContainer) },
+                                    label = { Text("${point.tipo}${if(point.regiao.isNotBlank()) " - " + point.regiao else ""}", color = MaterialTheme.colorScheme.onErrorContainer) },
                                     leadingIcon = { Icon(Icons.Filled.Warning, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp)) },
                                     trailingIcon = { 
                                         Icon(Icons.Filled.Close, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp).clickable { bodyPoints = bodyPoints - point }) 
@@ -697,21 +697,32 @@ fun VitimaFormScreen(
                             "pulso" to pulso,
                             "spo2" to saturacao,
                             "fr" to respiracao,
-                            "glasgow" to totalGlasgow.toString()
-                        )
-                        val glasgowMap = mapOf(
-                            "ao" to glasgowAO,
-                            "rv" to glasgowRV,
-                            "rm" to glasgowRM
+                            "glasgow" to totalGlasgow.toString(),
+                            "ao" to glasgowAO.toString(),
+                            "rv" to glasgowRV.toString(),
+                            "rm" to glasgowRM.toString()
                         )
                         
-                        val lesoesStr = bodyPoints.groupBy { it.tipo }.map { (tipo, pontos) ->
-                            val regioes = pontos.map { it.regiao }.filter { it.isNotBlank() }.distinct().joinToString(", ")
-                            if (regioes.isNotEmpty()) "$tipo em $regioes" else "${pontos.size}x $tipo"
-                        }.joinToString("; ")
+                        val burns = bodyPoints.filter { it.tipo == "Queimadura" }
+                        val otherLesions = bodyPoints.filter { it.tipo != "Queimadura" }
                         
-                        val burnArea = calcularAreaQueimada(bodyPoints)
-                        val burnStr = if (burnArea > 0) " \nÁrea Total Queimada (Regra dos Nove): $burnArea%" else ""
+                        val lesoesList = mutableListOf<String>()
+                        if (burns.isNotEmpty()) {
+                            val burnArea = calcularAreaQueimada(bodyPoints)
+                            val regioes = burns.map { it.regiao }.filter { it.isNotBlank() }.distinct().joinToString(", ")
+                            lesoesList.add("Queimadura em $regioes ($burnArea% SCQ)")
+                        }
+                        
+                        if (otherLesions.isNotEmpty()) {
+                            lesoesList.add(
+                                otherLesions.groupBy { it.tipo }.map { (tipo, pontos) ->
+                                    val regioes = pontos.map { it.regiao }.filter { it.isNotBlank() }.distinct().joinToString(", ")
+                                    if (regioes.isNotEmpty()) "$tipo em $regioes" else "${pontos.size}x $tipo"
+                                }.joinToString("; ")
+                            )
+                        }
+                        
+                        val lesoesStr = lesoesList.joinToString("; ")
                         
                         val nova = RoomNovaVitima(
                             id = vitima?.id ?: UUID.randomUUID().toString(),
@@ -719,8 +730,8 @@ fun VitimaFormScreen(
                             nome = selectedNome,
                             idade = null,
                             pessoaId = selectedPessoaId.takeIf { it.isNotBlank() },
-                            lesoes = if (lesoesStr.isEmpty()) "Nenhuma lesão mapeada" else lesoesStr + burnStr,
-                            lesoesEstruturadasJson = gson.toJson(glasgowMap),
+                            lesoes = if (lesoesStr.isEmpty()) "Nenhuma lesão mapeada" else lesoesStr,
+                            lesoesEstruturadasJson = "[]", // Limpando hack antigo do Glasgow
                             destinoSocorro = destinoSocorro,
                             quemSocorreu = quemSocorreu,
                             resultadoOcorrencia = resultadoOcorrencia,
@@ -924,6 +935,14 @@ fun BodyMappingScreen(
                 color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(16.dp)
             )
+            if (points.any { it.tipo == "Queimadura" }) {
+                Text(
+                    "💡 Regra da Palma da Mão: A palma da vítima (com dedos) = 1% SCQ.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp).padding(bottom = 8.dp)
+                )
+            }
         }
     }
     

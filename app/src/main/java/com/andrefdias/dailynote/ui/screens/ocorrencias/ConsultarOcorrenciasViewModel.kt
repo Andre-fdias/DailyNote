@@ -19,6 +19,7 @@ data class ConsultarOcorrenciasState(
     val ocorrencias: List<RoomNovaOcorrencia> = emptyList(),
     val viaturaMap: Map<String, String> = emptyMap(), // id -> prefixo
     val veiculosMap: Map<String, List<com.andrefdias.dailynote.data.local.entities.RoomNovoVeiculo>> = emptyMap(), // ocorrenciaId -> list of vehicles
+    val vitimasMap: Map<String, List<com.andrefdias.dailynote.data.local.entities.RoomNovaVitima>> = emptyMap(), // ocorrenciaId -> list of vitimas
     val errorMessage: String? = null
 )
 
@@ -39,11 +40,12 @@ class ConsultarOcorrenciasViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             try {
-                combine(
+                kotlinx.coroutines.flow.combine(
                     ocorrenciaRepository.getAllLocalOcorrenciasFlow(),
                     viaturaRepository.getAll(),
-                    ocorrenciaRepository.getAllVeiculosFlow()
-                ) { ocorrencias, viaturas, veiculos ->
+                    ocorrenciaRepository.getAllVeiculosFlow(),
+                    ocorrenciaRepository.getAllVitimasFlow()
+                ) { ocorrencias, viaturas, veiculos, vitimas ->
                     // Build a map: id -> prefixo AND prefixo -> prefixo (for records that already stored prefixo)
                     val map = mutableMapOf<String, String>()
                     viaturas.forEach { v ->
@@ -51,15 +53,21 @@ class ConsultarOcorrenciasViewModel @Inject constructor(
                         map[v.prefixo] = v.prefixo
                     }
                     val veiculosMap = veiculos.groupBy { it.ocorrenciaId }
-                    Triple(ocorrencias.sortedByDescending { it.createdAt }, map, veiculosMap)
-                }.collect { (ocorrencias, map, veiculosMap) ->
-                    _state.value = _state.value.copy(
+                    val vitimasMap = vitimas.groupBy { it.ocorrenciaId }
+                    // returning a list or custom object because Combine with 4 flows needs a custom transform if we want a tuple, wait, combine function in Flow takes up to 5 flows.
+                    // Actually, combine 4 flows produces a Tuple4 or we can just return a custom class.
+                    // I will return a 4-element data structure or use an array. Wait, in kotlin `combine` with 4 arguments has a lambda with 4 parameters.
+                    // The lambda returns whatever we want. Let's return a list or data class. Let's just return a list and cast, or better, return a data class.
+                    ConsultarOcorrenciasState(
                         isLoading = false,
-                        ocorrencias = ocorrencias,
+                        ocorrencias = ocorrencias.sortedByDescending { it.createdAt },
                         viaturaMap = map,
                         veiculosMap = veiculosMap,
+                        vitimasMap = vitimasMap,
                         errorMessage = null
                     )
+                }.collect { newState ->
+                    _state.value = newState
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(

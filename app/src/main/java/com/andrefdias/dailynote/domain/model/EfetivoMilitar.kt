@@ -1,0 +1,61 @@
+package com.andrefdias.dailynote.domain.model
+
+data class EfetivoMilitar(
+    val id: String,
+    val graduacao: String,
+    val re: String,
+    val digito: String,
+    val nomeCompleto: String,
+    val nomeDeGuerra: String,
+    val nomePadrao: String,
+    val eb: String,
+    val prontidao: String,
+    val admissao: String,
+    val ultimaPromocao: String,
+    val emailFuncional: String,
+    val emailParticular: String,
+    val contato: String,
+    val endereco: String,
+    val cpf: String,
+    val categoria: String,
+    val numeroCnh: String,
+    val validadeCnh: String,
+    val validadeToxicologico: String,
+    val voucher: String,
+    val ferias1Quinzena: String,
+    val ferias2Quinzena: String,
+    val aniversario: String,
+    val validadeIas: String,
+    val ultimoEap: String,
+    val turma2026: String,
+    val statusMvm: String,
+    val mvm: String,
+    val status: String,
+    val grau5: String,
+    val grau4: String,
+    val grau3: String,
+    val grau2: String,
+    val grau1: String,
+    val statusAdicional: String,
+    val observacao: String,
+    
+    // Especializações / Cursos
+    val cursos: Map<String, String> = emptyMap()
+)
+
+data class FolgaMensal(
+    val re: String,
+    val nomePadrao: String,
+    val janeiro: String,
+    val fevereiro: String,
+    val marco: String,
+    val abril: String,
+    val maio: String,
+    val junho: String,
+    val julho: String,
+    val agosto: String,
+    val setembro: String,
+    val outubro: String,
+    val novembro: String,
+    val dezembro: String
+)

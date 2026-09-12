@@ -54,7 +54,8 @@ fun HomeScreen(
     onNavigateToViaturas: () -> Unit,
     onNavigateToNova: () -> Unit,
     onNavigateToRelatorios: () -> Unit,
-    onNavigateToMapaForca: () -> Unit
+    onNavigateToMapaForca: () -> Unit,
+    onNavigateToEfetivo: () -> Unit
 ) {
     val calendarUiState by viewModel.uiState.collectAsState()
     val homeViewModel: HomeViewModel = hiltViewModel()
@@ -66,6 +67,7 @@ fun HomeScreen(
     val evolutionData        by homeViewModel.evolutionData.collectAsState()
     val unreadCount          by homeViewModel.unreadNotificationCount.collectAsState()
     val isRefreshing         by homeViewModel.isRefreshing.collectAsState()
+    val novidadesEfetivo     by homeViewModel.novidadesEfetivo.collectAsState()
 
     var showNotificationSheet by remember { mutableStateOf(false) }
 
@@ -75,11 +77,78 @@ fun HomeScreen(
     }
 
     val notifViewModel: NotificationCenterViewModel = hiltViewModel()
-    if (showNotificationSheet) {
+        if (showNotificationSheet) {
         NotificationBottomSheet(
             viewModel = notifViewModel,
             onDismiss = { showNotificationSheet = false },
             onNotificationClick = { }
+        )
+    }
+
+    // Popup de notificações não lidas ao abrir o app
+    val showNotificationPopup by homeViewModel.showNotificationPopup.collectAsState()
+    val notifications by homeViewModel.notifications.collectAsState()
+    val unreadNotifications = notifications.filter { !it.lida }
+    if (showNotificationPopup && unreadNotifications.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = { homeViewModel.dismissNotificationPopup() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Notifications,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(
+                    text = "${unreadNotifications.size} notificação(ões) não lida(s)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    unreadNotifications.take(4).forEach { notif ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Text("• ", color = MaterialTheme.colorScheme.primary)
+                            Column {
+                                Text(notif.titulo, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                                if (notif.descricao.isNotBlank()) {
+                                    Text(notif.descricao, style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                }
+                            }
+                        }
+                    }
+                    if (unreadNotifications.size > 4) {
+                        Text(
+                            text = "... e mais ${unreadNotifications.size - 4} notificação(ões)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    homeViewModel.dismissNotificationPopup()
+                    showNotificationSheet = true
+                }) {
+                    Text("Ver Todas")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { homeViewModel.dismissNotificationPopup() }) {
+                    Text("Agora Não")
+                }
+            }
         )
     }
 
@@ -118,7 +187,8 @@ fun HomeScreen(
                     onMapaOperacional = onNavigateToHistoricoMapa,
                     onRelatorios = onNavigateToRelatorios,
                     onMapaForca = onNavigateToMapaForca,
-                    onConsultar = onNavigateToConsult
+                    onConsultar = onNavigateToConsult,
+                    onEfetivo = onNavigateToEfetivo
                 )
             }
             item { MapaOperacionalSection(onVerMapa = onNavigateToHistoricoMapa) }
@@ -127,6 +197,9 @@ fun HomeScreen(
                     viaturas = viaturasEmProntidao,
                     onVerTodas = onNavigateToViaturas
                 )
+            }
+            item {
+                NovidadesEfetivoSection(novidades = novidadesEfetivo)
             }
             item { EvolucaoTemporalSection(evolutionData = evolutionData) }
             item { AgendaDiaSection(calendarUiState = calendarUiState) }
@@ -293,15 +366,19 @@ private fun SparklineChart(data: List<Float>, color: Color, modifier: Modifier =
 }
 
 @Composable
-private fun QuickActionsSection(onNova: () -> Unit, onMapaOperacional: () -> Unit, onRelatorios: () -> Unit, onMapaForca: () -> Unit, onConsultar: () -> Unit) {
+private fun QuickActionsSection(onNova: () -> Unit, onMapaOperacional: () -> Unit, onRelatorios: () -> Unit, onMapaForca: () -> Unit, onConsultar: () -> Unit, onEfetivo: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(text = "Acoes rapidas", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             QuickActionButton(icon = Icons.Filled.AddCircle, label = "Nova\nOcorrencia", iconColor = Color(0xFFE53935), onClick = onNova)
             QuickActionButton(icon = Icons.Filled.Map, label = "Mapa\nOperacional", iconColor = Color(0xFF43A047), onClick = onMapaOperacional)
             QuickActionButton(icon = Icons.Filled.Search, label = "Consultar\nOcorrencia", iconColor = Color(0xFF039BE5), onClick = onConsultar)
             QuickActionButton(icon = Icons.Filled.BarChart, label = "Relatorios", iconColor = Color(0xFFFFA000), onClick = onRelatorios)
             QuickActionButton(icon = Icons.Filled.Analytics, label = "Mapa\nForca", iconColor = Color(0xFF8E24AA), onClick = onMapaForca)
+            QuickActionButton(icon = Icons.Filled.Group, label = "Efetivo", iconColor = Color(0xFF1E88E5), onClick = onEfetivo)
         }
     }
 }
@@ -564,6 +641,56 @@ private fun AgendaItemRow(
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.primary
             )
+        }
+    }
+}
+
+@Composable
+fun NovidadesEfetivoSection(novidades: List<NovidadeEfetivo>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Novidades do Efetivo", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
+                Icon(Icons.Filled.Campaign, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            }
+            
+            if (novidades.isEmpty()) {
+                Box(modifier = Modifier.fillMaxWidth().height(60.dp), contentAlignment = Alignment.Center) {
+                    Text(text = "Nenhuma folga, afastamento ou alerta para hoje", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else {
+                novidades.forEach { novidade ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = novidade.militar,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = novidade.motivo,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.End
+                        )
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
+                }
+            }
         }
     }
 }

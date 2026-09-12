@@ -51,7 +51,8 @@ data class CalendarEvento(
     val cor: String, // Hex string
     val recorrencia: RecorrenciaTipo,
     val lembreteMinutos: Int?,
-    val escalaId: String? = null
+    val escalaId: String? = null,
+    val googleEventId: String? = null
 )
 
 enum class PrioridadeTarefa {
@@ -82,11 +83,12 @@ data class CalendarTarefa(
     val anexos: List<String> = emptyList(),
     val checklist: List<ChecklistItem> = emptyList(),
     val escalaId: String? = null,
-    val cor: String? = null
+    val cor: String? = null,
+    val googleEventId: String? = null
 )
 
 enum class CategoriaNotificacao {
-    ESCALAS, EVENTOS, AGENDA, TAREFAS, SISTEMA, BACKUP, OCORRENCIAS, TREINAMENTOS
+    ESCALAS, EVENTOS, AGENDA, TAREFAS, SISTEMA, BACKUP, OCORRENCIAS, TREINAMENTOS, EFETIVO
 }
 
 data class CalendarNotificacao(

@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.*
@@ -29,20 +28,54 @@ import javax.inject.Singleton
 
 data class DriveFile(val id: String, val name: String, val size: Long, val createdTime: String)
 
+data class BackupFile(val file: File, val relativePath: String)
+
+class ProgressRequestBody(
+    private val file: File,
+    private val contentType: MediaType,
+    private val onProgress: (Int) -> Unit
+) : RequestBody() {
+    override fun contentType() = contentType
+    override fun contentLength() = file.length()
+    override fun writeTo(sink: okio.BufferedSink) {
+        val length = file.length()
+        var uploaded = 0L
+        val buffer = ByteArray(8192)
+        FileInputStream(file).use { fis ->
+            var read: Int
+            while (fis.read(buffer).also { read = it } != -1) {
+                uploaded += read
+                sink.write(buffer, 0, read)
+                if (length > 0) {
+                    val progress = ((uploaded.toDouble() / length) * 100).toInt()
+                    onProgress(progress)
+                }
+            }
+        }
+    }
+}
+
 @Singleton
 class GoogleDriveBackupService @Inject constructor(
     @ApplicationContext private val context: Context,
     private val configuracaoDao: ConfiguracaoDao
 ) {
 
-    private val httpClient = OkHttpClient()
+    private val httpClient = OkHttpClient.Builder()
+        .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
 
-    // --- Google Sign-In Configuration for Drive AppData scope ---
     fun getGoogleSignInClient() = GoogleSignIn.getClient(
         context,
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestScopes(Scope("https://www.googleapis.com/auth/drive.appdata"))
+            .requestScopes(
+                Scope("https://www.googleapis.com/auth/drive.appdata"),
+                Scope("https://www.googleapis.com/auth/calendar.events"),
+                Scope("https://www.googleapis.com/auth/spreadsheets.readonly")
+            )
             .build()
     )
 
@@ -50,99 +83,123 @@ class GoogleDriveBackupService @Inject constructor(
         return GoogleSignIn.getLastSignedInAccount(context)
     }
 
-    // --- ZIP local files and database ---
-    suspend fun createBackupZip(outputFile: File): Result<Long> = withContext(Dispatchers.IO) {
+    private fun buildBackupFilesList(): List<BackupFile> {
+        val list = mutableListOf<BackupFile>()
+        
+        // 1. Databases
+        val dbDir = context.getDatabasePath("dailynote.db").parentFile
+        dbDir?.listFiles()?.forEach { file ->
+            if (file.isFile) list.add(BackupFile(file, "db/${file.name}"))
+        }
+        
+        // 2. Shared Prefs
+        val sharedPrefsDir = File(context.applicationInfo.dataDir, "shared_prefs")
+        if (sharedPrefsDir.exists()) {
+            sharedPrefsDir.listFiles()?.forEach { file ->
+                if (file.isFile) list.add(BackupFile(file, "sp/${file.name}"))
+            }
+        }
+        
+        // 3. Internal files
+        val internalDir = context.filesDir
+        internalDir?.let { dir ->
+            dir.walkTopDown().filter { it.isFile }.forEach { file ->
+                val relPath = file.toRelativeString(dir)
+                list.add(BackupFile(file, "files/$relPath"))
+            }
+        }
+        
+        // 4. External files
+        val externalDir = context.getExternalFilesDir(null)
+        externalDir?.let { dir ->
+            dir.walkTopDown().filter { it.isFile }.forEach { file ->
+                val relPath = file.toRelativeString(dir)
+                list.add(BackupFile(file, "ext/$relPath"))
+            }
+        }
+        
+        return list
+    }
+
+    suspend fun createBackupZip(outputFile: File, onProgress: ((Int) -> Unit)? = null): Result<Long> = withContext(Dispatchers.IO) {
         runCatching {
-            // Close database before zipping to ensure integrity
-            AppDatabase.closeDatabase()
+            // Checkpoint WAL para garantir que os dados estão no arquivo principal
+            AppDatabase.getDatabase(context).openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").close()
+            
+            val files = buildBackupFilesList()
+            val totalBytes = files.sumOf { it.file.length() }.coerceAtLeast(1L)
+            var copiedBytes = 0L
 
             ZipOutputStream(BufferedOutputStream(FileOutputStream(outputFile))).use { zos ->
-                // 1. Room encrypted Database file
-                val dbFile = context.getDatabasePath("dailynote.db")
-                if (dbFile.exists()) {
-                    addToZip(zos, dbFile, "database.db")
-                }
-                val shmFile = File(dbFile.path + "-shm")
-                if (shmFile.exists()) addToZip(zos, shmFile, "database.db-shm")
-                val walFile = File(dbFile.path + "-wal")
-                if (walFile.exists()) addToZip(zos, walFile, "database.db-wal")
-
-                // 2. Images subfolders: documentos, veiculos, evidencias, relatorios
-                val baseDir = context.getExternalFilesDir(null)
-                if (baseDir != null && baseDir.exists()) {
-                    listOf("documentos", "veiculos", "evidencias", "relatorios").forEach { folder ->
-                        val dir = File(baseDir, folder)
-                        if (dir.exists()) {
-                            zipDirectory(zos, dir, folder)
+                files.forEach { backupFile ->
+                    FileInputStream(backupFile.file).use { fis ->
+                        zos.putNextEntry(ZipEntry(backupFile.relativePath))
+                        val buffer = ByteArray(8192)
+                        var read: Int
+                        while (fis.read(buffer).also { read = it } != -1) {
+                            zos.write(buffer, 0, read)
+                            copiedBytes += read
+                            val progress = ((copiedBytes.toDouble() / totalBytes) * 100).toInt()
+                            onProgress?.invoke(progress)
                         }
+                        zos.closeEntry()
                     }
                 }
-
-                // 3. Config JSON file
-                val configJson = File(context.cacheDir, "config.json")
-                val config = configuracaoDao.getConfiguracao() ?: RoomConfiguracao()
-                val configJsonData = JSONObject().apply {
-                    put("tema", config.tema)
-                    put("backupAutomatico", config.backupAutomatico)
-                    put("backupSomenteWifi", config.backupSomenteWifi)
-                }
-                FileWriter(configJson).use { it.write(configJsonData.toString()) }
-                addToZip(zos, configJson, "config.json")
-                configJson.delete()
             }
             outputFile.length()
         }
     }
 
-    private fun addToZip(zos: ZipOutputStream, file: File, entryPath: String) {
-        FileInputStream(file).use { fis ->
-            zos.putNextEntry(ZipEntry(entryPath))
-            fis.copyTo(zos)
-            zos.closeEntry()
-        }
-    }
-
-    private fun zipDirectory(zos: ZipOutputStream, dir: File, parentPath: String) {
-        val files = dir.listFiles() ?: return
-        for (file in files) {
-            val entryPath = "$parentPath/${file.name}"
-            if (file.isDirectory) {
-                zipDirectory(zos, file, entryPath)
-            } else {
-                addToZip(zos, file, entryPath)
-            }
-        }
-    }
-
-    // --- Google Drive REST API Actions ---
-    suspend fun uploadBackupToDrive(accessToken: String): Result<RoomBackupLog> = withContext(Dispatchers.IO) {
+    suspend fun uploadBackupToDrive(accessToken: String, onProgress: ((Int, String) -> Unit)? = null): Result<RoomBackupLog> = withContext(Dispatchers.IO) {
         android.util.Log.d("DailyBackup", "Iniciando upload de backup para o Google Drive")
+        android.util.Log.d("DailyBackup", "Access token (primeiros 20 chars): ${accessToken.take(20)}...")
         runCatching {
             val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm"))
             val backupFileName = "Backup_$timestamp.zip"
             val tempZipFile = File(context.cacheDir, backupFileName)
             if (tempZipFile.exists()) tempZipFile.delete()
 
-            android.util.Log.d("DailyBackup", "Criando arquivo ZIP local para upload: $backupFileName")
-            val size = createBackupZip(tempZipFile).getOrThrow()
+            onProgress?.invoke(0, "Compactando...")
+            val size = createBackupZip(tempZipFile) { prog ->
+                onProgress?.invoke(prog, "Compactando...")
+            }.getOrThrow()
+            android.util.Log.d("DailyBackup", "ZIP criado: ${tempZipFile.length()} bytes em ${tempZipFile.absolutePath}")
 
-            // 1. Google Drive Multipart Upload request
-            val metadata = JSONObject().apply {
-                put("name", backupFileName)
-                put("parents", listOf("appDataFolder"))
-            }.toString()
+            onProgress?.invoke(0, "Enviando...")
+            val metadataJson = """{"name":"$backupFileName","parents":["appDataFolder"]}"""
+            android.util.Log.d("DailyBackup", "Metadata: $metadataJson")
 
-            val requestBody = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addPart(
-                    Headers.Builder().add("Content-Type", "application/json; charset=UTF-8").build(),
-                    metadata.toRequestBody("application/json; charset=UTF-8".toMediaType())
-                )
-                .addPart(
-                    Headers.Builder().add("Content-Type", "application/zip").build(),
-                    tempZipFile.asRequestBody("application/zip".toMediaType())
-                )
-                .build()
+            // Construir multipart/related com boundary explícito
+            val boundary = "backup_boundary_${System.currentTimeMillis()}"
+            val metadataBytes = metadataJson.toByteArray(Charsets.UTF_8)
+            val zipBytes = tempZipFile.readBytes()
+
+            // Montar corpo manualmente para garantir conformidade com a API do Drive
+            val bodyStream = ByteArrayOutputStream()
+            bodyStream.write("--$boundary\r\n".toByteArray())
+            bodyStream.write("Content-Type: application/json; charset=UTF-8\r\n\r\n".toByteArray())
+            bodyStream.write(metadataBytes)
+            bodyStream.write("\r\n--$boundary\r\n".toByteArray())
+            bodyStream.write("Content-Type: application/zip\r\n\r\n".toByteArray())
+
+            val totalUpload = (metadataBytes.size + zipBytes.size).toLong()
+            var uploaded = 0L
+            val bufSize = 65536
+            var offset = 0
+            while (offset < zipBytes.size) {
+                val end = minOf(offset + bufSize, zipBytes.size)
+                bodyStream.write(zipBytes, offset, end - offset)
+                uploaded += (end - offset)
+                val prog = ((uploaded.toDouble() / totalUpload) * 100).toInt()
+                onProgress?.invoke(prog.coerceIn(0, 99), "Enviando...")
+                offset = end
+            }
+            bodyStream.write("\r\n--$boundary--\r\n".toByteArray())
+
+            val bodyBytes = bodyStream.toByteArray()
+            android.util.Log.d("DailyBackup", "Corpo total da requisição: ${bodyBytes.size} bytes")
+
+            val requestBody = bodyBytes.toRequestBody("multipart/related; boundary=$boundary".toMediaType())
 
             val request = Request.Builder()
                 .url("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
@@ -150,19 +207,19 @@ class GoogleDriveBackupService @Inject constructor(
                 .post(requestBody)
                 .build()
 
-            android.util.Log.d("DailyBackup", "Enviando arquivo ZIP para API do Google Drive...")
             httpClient.newCall(request).execute().use { response ->
+                val responseBody = response.body?.string() ?: "(sem corpo)"
+                android.util.Log.d("DailyBackup", "Drive response code: ${response.code}")
+                android.util.Log.d("DailyBackup", "Drive response body: $responseBody")
                 if (!response.isSuccessful) {
-                    val errMsg = "Falha no upload do Google Drive: ${response.message}"
-                    android.util.Log.e("DailyBackup", errMsg)
-                    throw IOException(errMsg)
+                    throw IOException("Falha no upload HTTP ${response.code}: $responseBody")
                 }
+                android.util.Log.d("DailyBackup", "Upload concluído com sucesso!")
             }
 
             tempZipFile.delete()
-            android.util.Log.d("DailyBackup", "Upload de backup concluído com sucesso. Tamanho: $size bytes")
+            onProgress?.invoke(100, "Concluído!")
 
-            // Log Success
             val log = RoomBackupLog(
                 id = UUID.randomUUID().toString(),
                 dataHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
@@ -216,8 +273,7 @@ class GoogleDriveBackupService @Inject constructor(
         }
     }
 
-    suspend fun restoreBackupFromDrive(accessToken: String, fileId: String): Result<Unit> = withContext(Dispatchers.IO) {
-        android.util.Log.d("DailyBackup", "Iniciando restauração de backup do Google Drive, ID do arquivo: $fileId")
+    suspend fun restoreBackupFromDrive(accessToken: String, fileId: String, onProgress: ((Int, String) -> Unit)? = null): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val url = "https://www.googleapis.com/drive/v3/files/$fileId?alt=media"
             val request = Request.Builder()
@@ -226,60 +282,65 @@ class GoogleDriveBackupService @Inject constructor(
                 .get()
                 .build()
 
-            android.util.Log.d("DailyBackup", "Fazendo download do backup do Google Drive...")
+            onProgress?.invoke(0, "Baixando backup...")
             httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    val errMsg = "Erro ao baixar arquivo do Drive: ${response.message}"
-                    android.util.Log.e("DailyBackup", errMsg)
-                    throw IOException(errMsg)
-                }
+                if (!response.isSuccessful) throw IOException("Erro ao baixar arquivo do Drive: ${response.message}")
+                val contentLength = response.body?.contentLength() ?: -1L
                 val bodyStream = response.body?.byteStream() ?: throw IOException("Corpo do arquivo vazio")
 
-                // Close database before restore overwriting
-                android.util.Log.d("DailyBackup", "Fechando banco de dados temporariamente para restauração...")
                 AppDatabase.closeDatabase()
 
-                android.util.Log.d("DailyBackup", "Descompactando ZIP e restaurando arquivos...")
-                ZipInputStream(BufferedInputStream(bodyStream)).use { zis ->
+                // Calculate progress during download/unzip by tracking bytes read
+                var totalRead = 0L
+                val countingInputStream = object : FilterInputStream(bodyStream) {
+                    override fun read(b: ByteArray, off: Int, len: Int): Int {
+                        val read = super.read(b, off, len)
+                        if (read != -1) {
+                            totalRead += read
+                            if (contentLength > 0) {
+                                val progress = ((totalRead.toDouble() / contentLength) * 100).toInt()
+                                onProgress?.invoke(progress, "Restaurando...")
+                            }
+                        }
+                        return read
+                    }
+                }
+
+                ZipInputStream(BufferedInputStream(countingInputStream)).use { zis ->
                     var entry = zis.nextEntry
                     while (entry != null) {
-                        if (entry.name.startsWith("database.db")) {
-                            val dbFile = when (entry.name) {
-                                "database.db-shm" -> File(context.getDatabasePath("dailynote.db").path + "-shm")
-                                "database.db-wal" -> File(context.getDatabasePath("dailynote.db").path + "-wal")
-                                else -> context.getDatabasePath("dailynote.db")
+                        val targetFile = when {
+                            entry.name.startsWith("db/") -> {
+                                val name = entry.name.removePrefix("db/")
+                                File(context.getDatabasePath("dailynote.db").parentFile, name)
                             }
-                            dbFile.parentFile?.mkdirs()
-                            FileOutputStream(dbFile).use { fos ->
-                                zis.copyTo(fos)
+                            entry.name.startsWith("sp/") -> {
+                                val name = entry.name.removePrefix("sp/")
+                                File(context.applicationInfo.dataDir, "shared_prefs/$name")
                             }
-                            android.util.Log.d("DailyBackup", "Arquivo de banco de dados restaurado: ${entry.name}")
-                        } else if (entry.name.startsWith("documentos/") || entry.name.startsWith("veiculos/") ||
-                            entry.name.startsWith("evidencias/") || entry.name.startsWith("relatorios/")
-                        ) {
-                            val targetFile = File(context.getExternalFilesDir(null), entry.name)
+                            entry.name.startsWith("files/") -> {
+                                val relPath = entry.name.removePrefix("files/")
+                                File(context.filesDir, relPath)
+                            }
+                            entry.name.startsWith("ext/") -> {
+                                val relPath = entry.name.removePrefix("ext/")
+                                File(context.getExternalFilesDir(null), relPath)
+                            }
+                            else -> null
+                        }
+
+                        if (targetFile != null) {
                             targetFile.parentFile?.mkdirs()
                             FileOutputStream(targetFile).use { fos ->
                                 zis.copyTo(fos)
                             }
-                        } else if (entry.name == "config.json") {
-                            val data = zis.readBytes().toString(Charsets.UTF_8)
-                            val json = JSONObject(data)
-                            val config = configuracaoDao.getConfiguracao() ?: RoomConfiguracao()
-                            configuracaoDao.insertConfiguracao(
-                                config.copy(
-                                    tema = json.optString("tema", "Automático"),
-                                    backupAutomatico = json.optString("backupAutomatico", "Desativado"),
-                                    backupSomenteWifi = json.optBoolean("backupSomenteWifi", true)
-                                )
-                            )
                         }
+                        
                         zis.closeEntry()
                         entry = zis.nextEntry
                     }
                 }
             }
-            android.util.Log.d("DailyBackup", "Restauração de backup concluída com sucesso.")
             Unit
         }
     }

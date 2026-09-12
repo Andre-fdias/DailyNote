@@ -48,11 +48,43 @@ object LogHelper {
         scope.launch {
             try {
                 val logFile = File(ctx.cacheDir, "firenotes_logs.txt")
+                
+                // Limitar tamanho do arquivo a ~1MB
+                if (logFile.exists() && logFile.length() > 1024 * 1024) {
+                    val lines = logFile.readLines()
+                    // Manter apenas a última metade das linhas
+                    logFile.writeText(lines.takeLast(lines.size / 2).joinToString("\n") + "\n")
+                }
+                
                 val timestamp = LocalDateTime.now().format(formatter)
                 val entry = "[$timestamp] [$level] [$tag] $msg\n"
                 logFile.appendText(entry)
             } catch (_: Exception) {
             }
         }
+    }
+
+    fun getLogs(): String {
+        val ctx = appContext ?: return "Contexto não inicializado."
+        return try {
+            val logFile = File(ctx.cacheDir, "firenotes_logs.txt")
+            if (logFile.exists()) {
+                logFile.readText()
+            } else {
+                "Nenhum log encontrado."
+            }
+        } catch (e: Exception) {
+            "Erro ao ler logs: ${e.localizedMessage}"
+        }
+    }
+    
+    fun clearLogs() {
+        val ctx = appContext ?: return
+        try {
+            val logFile = File(ctx.cacheDir, "firenotes_logs.txt")
+            if (logFile.exists()) {
+                logFile.delete()
+            }
+        } catch (_: Exception) {}
     }
 }

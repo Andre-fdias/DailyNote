@@ -5,20 +5,28 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andrefdias.dailynote.domain.model.*
+
+
+import com.andrefdias.dailynote.domain.calendar.NotificationCenter
+import com.andrefdias.dailynote.domain.calendar.NotificationScheduler
 import com.andrefdias.dailynote.domain.calendar.ScaleEngine
 import com.andrefdias.dailynote.domain.repository.CalendarRepository
+import com.andrefdias.dailynote.domain.repository.EfetivoRepository
 import com.andrefdias.dailynote.domain.repository.SettingsRepository
 import com.andrefdias.dailynote.domain.repository.OcorrenciaRepository
 import com.andrefdias.dailynote.domain.repository.EquipeServicoRepository
 import com.andrefdias.dailynote.domain.repository.ViaturaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,6 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
+    private val efetivoRepository: EfetivoRepository,
     private val settingsRepository: SettingsRepository,
     private val ocorrenciaRepository: OcorrenciaRepository,
     private val equipeServicoRepository: EquipeServicoRepository,
@@ -90,10 +99,33 @@ class HomeViewModel @Inject constructor(
     private val _hasDismissedAlertsThisSession = MutableStateFlow(false)
     val hasDismissedAlertsThisSession: StateFlow<Boolean> = _hasDismissedAlertsThisSession.asStateFlow()
 
+    private val _showNotificationPopup = MutableStateFlow(false)
+    val showNotificationPopup: StateFlow<Boolean> = _showNotificationPopup.asStateFlow()
+
+    private val _novidadesEfetivo = MutableStateFlow<List<NovidadeEfetivo>>(emptyList())
+    val novidadesEfetivo: StateFlow<List<NovidadeEfetivo>> = _novidadesEfetivo.asStateFlow()
+
     init {
         observeData()
         observeEscalaFilter()
         observePreviewDays()
+        // Gera notificações direto no ViewModel - 100% confiável
+        viewModelScope.launch(Dispatchers.IO) { gerarNotificacoesAgenda() }
+        viewModelScope.launch(Dispatchers.IO) { gerarAlertasEfetivo() }
+        // Popup reativo: aparece assim que notificações chegarem
+        viewModelScope.launch {
+            calendarRepository.getNotificacoesFlow().collect { notifs ->
+                val unread = notifs.count { !it.lida }
+                if (unread > 0 && !_hasDismissedAlertsThisSession.value && !_showNotificationPopup.value) {
+                    _showNotificationPopup.value = true
+                }
+            }
+        }
+    }
+
+    fun dismissNotificationPopup() {
+        _showNotificationPopup.value = false
+        _hasDismissedAlertsThisSession.value = true
     }
 
     private fun observeData() {
@@ -111,6 +143,89 @@ class HomeViewModel @Inject constructor(
             calendarRepository.getNotificacoesFlow().collect {
                 _notifications.value = it
                 _unreadNotificationCount.value = it.count { n -> !n.lida }
+            }
+        }
+        viewModelScope.launch {
+            kotlinx.coroutines.flow.combine(
+                efetivoRepository.getFolgas(),
+                efetivoRepository.getAfastamentos(),
+                efetivoRepository.getEfetivo()
+            ) { folgas, afastamentos, efetivos ->
+                val novidades = mutableListOf<NovidadeEfetivo>()
+                val hoje = LocalDate.now()
+                val mesAtual = hoje.monthValue
+                
+                fun extrairFolga(folga: com.andrefdias.dailynote.domain.model.FolgaMensal, mes: Int): String {
+                    return when (mes) {
+                        1 -> folga.janeiro; 2 -> folga.fevereiro; 3 -> folga.marco; 4 -> folga.abril
+                        5 -> folga.maio; 6 -> folga.junho; 7 -> folga.julho; 8 -> folga.agosto
+                        9 -> folga.setembro; 10 -> folga.outubro; 11 -> folga.novembro; 12 -> folga.dezembro
+                        else -> ""
+                    }
+                }
+                
+                fun getFolgasDatas(f: com.andrefdias.dailynote.domain.model.FolgaMensal, dataRef: LocalDate): List<LocalDate> {
+                    val str = extrairFolga(f, dataRef.monthValue)
+                    if (str.isBlank() || str == "-") return emptyList()
+                    return str.split(Regex("[^0-9]+")).mapNotNull { it.trim().toIntOrNull() }.mapNotNull {
+                        try { LocalDate.of(dataRef.year, dataRef.monthValue, it) } catch (e: Exception) { null }
+                    }
+                }
+                
+                folgas.forEach { f ->
+                    val nome = f.nomePadrao.takeIf { it.isNotBlank() } ?: f.re.takeIf { it.isNotBlank() } ?: "Militar"
+                    val folgasMesAtual = getFolgasDatas(f, hoje)
+                    val folgasProxMes = getFolgasDatas(f, hoje.plusMonths(1))
+                    (folgasMesAtual + folgasProxMes).forEach { dataFolga ->
+                        if (!dataFolga.isBefore(hoje) && !dataFolga.isAfter(hoje.plusDays(5))) {
+                            val formattedDate = dataFolga.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM"))
+                            novidades.add(NovidadeEfetivo(nome, "Folga ($formattedDate)"))
+                        }
+                    }
+                }
+                
+                val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val formatterTwoDigitYear = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy")
+                fun parseDate(dateStr: String): LocalDate? {
+                    if (dateStr.isBlank()) return null
+                    val cleaned = dateStr.trim()
+                    return try {
+                        if (cleaned.length == 8) LocalDate.parse(cleaned, formatterTwoDigitYear)
+                        else LocalDate.parse(cleaned, dateFormatter)
+                    } catch (e: Exception) { null }
+                }
+
+                afastamentos.forEach { af ->
+                    val inicio = parseDate(af.dataInicio)
+                    val fim = parseDate(af.dataTermino)
+                    if (inicio != null && fim != null) {
+                        val limite = hoje.plusDays(5)
+                        if (!fim.isBefore(hoje) && !inicio.isAfter(limite)) {
+                            val formatterOut = java.time.format.DateTimeFormatter.ofPattern("dd/MM")
+                            val strDatas = if (inicio.isEqual(fim)) inicio.format(formatterOut) else "${inicio.format(formatterOut)} a ${fim.format(formatterOut)}"
+                            novidades.add(NovidadeEfetivo(af.militar, "${af.tipoAfastamento} ($strDatas)"))
+                        }
+                    }
+                }
+                
+                efetivos.forEach { militar ->
+                    val nome = militar.nomeDeGuerra.ifBlank { militar.nomeCompleto }
+                    fun verificar(campo: String, label: String, dataStr: String) {
+                        val data = parseDate(dataStr) ?: return
+                        val dias = ChronoUnit.DAYS.between(hoje, data)
+                        if (dias <= 30) {
+                            val alertMsg = if (dias < 0) "$label VENCIDO há ${-dias}d" else "$label vence em ${dias}d"
+                            novidades.add(NovidadeEfetivo(nome, alertMsg))
+                        }
+                    }
+                    verificar("CNH", "CNH", militar.validadeCnh)
+                    verificar("TOX", "Toxicológico", militar.validadeToxicologico)
+                    verificar("IAS", "IAS", militar.validadeIas)
+                }
+                
+                novidades
+            }.collect {
+                _novidadesEfetivo.value = it
             }
         }
         viewModelScope.launch {
@@ -356,4 +471,129 @@ class HomeViewModel @Inject constructor(
     fun clearAllNotificacoes() {
         viewModelScope.launch { calendarRepository.clearAllNotificacoes() }
     }
+
+    // ── Geração direta de notificações ───────────────────────────────────────
+
+    private suspend fun gerarNotificacoesAgenda() {
+        try {
+            val hoje = LocalDate.now()
+            val amanha = hoje.plusDays(1)
+            val dateFmt = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+            val timeFmt = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+            val agora = java.time.LocalTime.now()
+
+            val jaGeradas = calendarRepository.getNotificacoes()
+                .filter { it.data == hoje.toString() }
+                .map { it.titulo }.toSet()
+
+            fun criarNotif(titulo: String, desc: String, cat: CategoriaNotificacao, prio: PrioridadeTarefa) =
+                CalendarNotificacao(
+                    id = UUID.randomUUID().toString(), categoria = cat, titulo = titulo,
+                    descricao = desc, data = hoje.toString(), hora = agora.format(timeFmt),
+                    prioridade = prio, lida = false, origem = "AGENDA"
+                )
+
+            // Eventos de hoje
+            calendarRepository.getEventosForDay(hoje.format(dateFmt)).forEach { ev ->
+                val titulo = "📅 Hoje: ${ev.titulo}"
+                if (titulo !in jaGeradas) {
+                    val hora = ev.hora?.let { runCatching { java.time.LocalTime.parse(it) }.getOrNull() }
+                    val horaStr = hora?.format(timeFmt) ?: "Dia todo"
+                    val mins = hora?.let { ChronoUnit.MINUTES.between(agora, it) }
+                    val prio = if (mins != null && mins in 0..120) PrioridadeTarefa.ALTA else PrioridadeTarefa.MEDIA
+                    val desc = when {
+                        mins != null && mins <= 60 -> "⚡ Em ${mins}min! ${ev.titulo} às $horaStr"
+                        else -> "${ev.titulo} às $horaStr. ${ev.descricao}"
+                    }
+                    val notif = criarNotif(titulo, desc, CategoriaNotificacao.AGENDA, prio)
+                    calendarRepository.saveNotificacao(notif)
+                    NotificationCenter.triggerSystemNotification(context, notif)
+                    NotificationScheduler.scheduleForEvento(context, ev)
+                    Log.i(TAG, "🔔 Evento hoje: $titulo")
+                }
+            }
+
+            // Tarefas de hoje
+            calendarRepository.getTarefasForDay(hoje.format(dateFmt))
+                .filter { it.status != StatusTarefa.CONCLUIDA }.forEach { tarefa ->
+                    val titulo = "✅ Tarefa: ${tarefa.titulo}"
+                    if (titulo !in jaGeradas) {
+                        val hora = tarefa.hora?.let { runCatching { java.time.LocalTime.parse(it) }.getOrNull() }
+                        val horaStr = hora?.format(timeFmt) ?: "Dia todo"
+                        val notif = criarNotif(titulo, "Tarefa pendente hoje às $horaStr.", CategoriaNotificacao.TAREFAS, PrioridadeTarefa.MEDIA)
+                        calendarRepository.saveNotificacao(notif)
+                        NotificationCenter.triggerSystemNotification(context, notif)
+                        NotificationScheduler.scheduleForTarefa(context, tarefa)
+                    }
+                }
+
+            // Eventos de amanhã
+            calendarRepository.getEventosForDay(amanha.format(dateFmt)).forEach { ev ->
+                val titulo = "⏰ Amanhã: ${ev.titulo}"
+                if (titulo !in jaGeradas) {
+                    val hora = ev.hora?.let { runCatching { java.time.LocalTime.parse(it) }.getOrNull() }
+                    val horaStr = hora?.format(timeFmt) ?: "Dia todo"
+                    val notif = criarNotif(titulo, "Lembrete: ${ev.titulo} amanhã às $horaStr.", CategoriaNotificacao.AGENDA, PrioridadeTarefa.MEDIA)
+                    calendarRepository.saveNotificacao(notif)
+                    NotificationCenter.triggerSystemNotification(context, notif)
+                    NotificationScheduler.scheduleForEvento(context, ev)
+                }
+            }
+        } catch (e: Exception) { Log.e(TAG, "Erro ao gerar notificações da agenda", e) }
+    }
+
+    private suspend fun gerarAlertasEfetivo() {
+        try {
+            val hoje = LocalDate.now()
+            val timeFmt = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+            val agora = java.time.LocalTime.now()
+            val dateFmt2d = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            val dateFmt2s = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy")
+
+            fun parseDate(s: String): LocalDate? {
+                if (s.isBlank()) return null
+                return runCatching { LocalDate.parse(s.trim(), dateFmt2d) }.getOrNull()
+                    ?: runCatching { LocalDate.parse(s.trim(), dateFmt2s) }.getOrNull()
+            }
+
+            val jaGeradas = calendarRepository.getNotificacoes()
+                .filter { it.data == hoje.toString() && it.categoria == CategoriaNotificacao.EFETIVO }
+                .map { it.titulo }.toSet()
+
+            val efetivos = efetivoRepository.getEfetivo().first()
+            Log.d(TAG, "👮 Efetivos para checar: ${efetivos.size}")
+
+            efetivos.forEach { militar ->
+                val nome = militar.nomeDeGuerra.ifBlank { militar.nomeCompleto }
+
+                suspend fun verificar(campo: String, label: String, dataStr: String) {
+                    val data = parseDate(dataStr) ?: return
+                    val dias = ChronoUnit.DAYS.between(hoje, data)
+                    val (titulo, desc, prio) = when {
+                        dias < 0   -> Triple("🔴 $label VENCIDO: $nome", "$label venceu há ${-dias}d ($dataStr). Regularize!", PrioridadeTarefa.ALTA)
+                        dias <= 30 -> Triple("🟡 $label vence em ${dias}d: $nome", "$label vence em $dias dias ($dataStr).", PrioridadeTarefa.ALTA)
+                        dias <= 90 -> Triple("🔵 $label: $nome", "$label vence em $dias dias ($dataStr).", PrioridadeTarefa.MEDIA)
+                        else -> return
+                    }
+                    if (titulo !in jaGeradas) {
+                        val notif = CalendarNotificacao(
+                            id = UUID.randomUUID().toString(), categoria = CategoriaNotificacao.EFETIVO,
+                            titulo = titulo, descricao = desc, data = hoje.toString(),
+                            hora = agora.format(timeFmt), prioridade = prio, lida = false, origem = "EFETIVO"
+                        )
+                        calendarRepository.saveNotificacao(notif)
+                        NotificationCenter.triggerSystemNotification(context, notif)
+                        Log.i(TAG, "👮 Alerta efetivo: $titulo")
+                    }
+                }
+
+                verificar("CNH", "CNH", militar.validadeCnh)
+                verificar("TOX", "Tox. Sanguíneo", militar.validadeToxicologico)
+                verificar("IAS", "IAS", militar.validadeIas)
+            }
+        } catch (e: Exception) { Log.e(TAG, "Erro ao gerar alertas do efetivo", e) }
+    }
 }
+
+data class NovidadeEfetivo(val militar: String, val motivo: String)
+

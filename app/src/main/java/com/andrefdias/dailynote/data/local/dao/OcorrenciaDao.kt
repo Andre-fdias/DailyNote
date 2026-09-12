@@ -24,6 +24,9 @@ interface OcorrenciaDao {
     @Query("SELECT * FROM nova_ocorrencias WHERE id = :id")
     fun getOcorrenciaByIdFlow(id: String): Flow<RoomNovaOcorrencia?>
 
+    @Query("SELECT * FROM nova_ocorrencias WHERE id = :id")
+    suspend fun getOcorrenciaById(id: String): RoomNovaOcorrencia?
+
     // ==================
     // Vítimas
     // ==================

@@ -140,6 +140,32 @@ fun NotificationBottomSheet(
                         )
                     )
                 }
+                item {
+                    FilterChip(
+                        selected = selectedFilter == CategoriaNotificacao.EFETIVO,
+                        onClick = { selectedFilter = CategoriaNotificacao.EFETIVO },
+                        label = { Text("Efetivo") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = FireColors.Primary,
+                            selectedLabelColor = Color.White,
+                            containerColor = FireColors.SurfaceVariant,
+                            labelColor = onSurface
+                        )
+                    )
+                }
+                item {
+                    FilterChip(
+                        selected = selectedFilter == CategoriaNotificacao.SISTEMA,
+                        onClick = { selectedFilter = CategoriaNotificacao.SISTEMA },
+                        label = { Text("Sistema") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = FireColors.Primary,
+                            selectedLabelColor = Color.White,
+                            containerColor = FireColors.SurfaceVariant,
+                            labelColor = onSurface
+                        )
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -178,6 +204,9 @@ fun NotificationBottomSheet(
                             CategoriaNotificacao.EVENTOS   -> Color(0xFF388E3C)
                             CategoriaNotificacao.TAREFAS   -> Color(0xFFF57C00)
                             CategoriaNotificacao.SISTEMA   -> Color(0xFFD32F2F)
+                            CategoriaNotificacao.EFETIVO   -> Color(0xFF00ACC1) // Cyan
+                            CategoriaNotificacao.OCORRENCIAS -> Color(0xFFE53935)
+                            CategoriaNotificacao.TREINAMENTOS -> Color(0xFF8E24AA)
                             else                           -> Color(0xFF7B1FA2)
                         }
 
@@ -249,8 +278,12 @@ fun NotificationBottomSheet(
                                         onClick = { expanded = false; onNotificationClick(notif) }
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("Marcar como lida") },
+                                        text = { Text(if (notif.lida) "Marcar como não lida" else "Marcar como lida") },
                                         onClick = { expanded = false; viewModel.toggleNotificationLida(notif) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Excluir", color = MaterialTheme.colorScheme.error) },
+                                        onClick = { expanded = false; viewModel.deleteNotification(notif) }
                                     )
                                 }
                             }

@@ -8,17 +8,26 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -65,6 +74,7 @@ private val mainNavItems = listOf(
     BottomNavItem(Screen.AgendaRoot, "Agenda", Icons.Filled.CalendarToday, Icons.Outlined.CalendarToday),
     BottomNavItem(Screen.MapaForcaRoot, "Mapa Força", Icons.Filled.Map, Icons.Outlined.Map),
     BottomNavItem(Screen.OcorrenciasRoot, "Ocorrências", Icons.Filled.LocalPolice, Icons.Outlined.LocalPolice),
+    BottomNavItem(Screen.EfetivoDashboard, "Efetivo", Icons.Filled.Groups, Icons.Outlined.Groups),
     BottomNavItem(Screen.Settings, "Config.", Icons.Filled.Settings, Icons.Outlined.Settings)
 )
 
@@ -78,7 +88,7 @@ private val agendaNavItems = listOf(
 private val mapaForcaNavItems = listOf(
     BottomNavItem(Screen.Home, "Início", Icons.Filled.Home, Icons.Outlined.Home),
     BottomNavItem(Screen.MapaDia, "Mapa", Icons.Filled.Today, Icons.Outlined.Today),
-    BottomNavItem(Screen.EquipeServico, "Compor", Icons.Filled.Assignment, Icons.Outlined.Assignment),
+    BottomNavItem(Screen.EquipeServico, "Compor", Icons.AutoMirrored.Filled.Assignment, Icons.AutoMirrored.Outlined.Assignment),
     BottomNavItem(Screen.HistoricoMapaForca, "Histórico", Icons.Filled.History, Icons.Outlined.History),
     BottomNavItem(Screen.Militar, "Militares", Icons.Filled.People, Icons.Outlined.People),
     BottomNavItem(Screen.Viatura, "Viaturas", Icons.Filled.DirectionsCar, Icons.Outlined.DirectionsCar),
@@ -86,7 +96,7 @@ private val mapaForcaNavItems = listOf(
 )
 
 private val historicoNavItems = listOf(
-    BottomNavItem(Screen.MapaForcaRoot, "Voltar", Icons.Filled.ArrowBack, Icons.Outlined.ArrowBack),
+    BottomNavItem(Screen.MapaForcaRoot, "Voltar", Icons.AutoMirrored.Filled.ArrowBack, Icons.AutoMirrored.Outlined.ArrowBack),
     BottomNavItem(Screen.HistoricoMapaForca, "Mapa Força", Icons.Filled.Analytics, Icons.Outlined.Analytics),
     BottomNavItem(Screen.HistoricoDashboard, "Ocorrência", Icons.Filled.LocalPolice, Icons.Outlined.LocalPolice)
 )
@@ -99,6 +109,12 @@ private val ocorrenciasNavItems = listOf(
     BottomNavItem(Screen.Relatorios, "Relatórios", Icons.Filled.Description, Icons.Outlined.Description)
 )
 
+private val efetivoNavItems = listOf(
+    BottomNavItem(Screen.Home, "Início", Icons.Filled.Home, Icons.Outlined.Home),
+    BottomNavItem(Screen.EfetivoDashboard, "Dashboard", Icons.Filled.Dashboard, Icons.Outlined.Dashboard),
+    BottomNavItem(Screen.EfetivoList, "Consultar", Icons.Filled.Search, Icons.Outlined.Search)
+)
+
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
 
@@ -108,11 +124,30 @@ class MainActivity : FragmentActivity() {
     @Inject
     lateinit var googleCalendarSyncManager: GoogleCalendarSyncManager
 
+    @Inject
+    lateinit var ocorrenciaRepository: com.andrefdias.dailynote.domain.repository.OcorrenciaRepository
+
+    @Inject
+    lateinit var configuracaoDao: com.andrefdias.dailynote.data.local.dao.ConfiguracaoDao
+
+    private val pendingWidgetAction = kotlinx.coroutines.flow.MutableStateFlow<android.content.Intent?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         com.andrefdias.dailynote.util.LogHelper.init(applicationContext)
-
         NotificationCenter.initNotificationChannels(this)
+
+        // Inicializa o agendamento de backup em background
+        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val config = configuracaoDao.getConfiguracao()
+            if (config != null) {
+                com.andrefdias.dailynote.data.worker.BackupScheduler.scheduleNextBackup(
+                    this@MainActivity, 
+                    config.backupAutomatico, 
+                    config.backupSomenteWifi
+                )
+            }
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -131,6 +166,8 @@ class MainActivity : FragmentActivity() {
             )
         )
 
+        handleIncomingIntent(intent)
+
         setContent {
             val theme by settingsRepository.themeFlow.collectAsState(initial = "Automático")
             val isDarkTheme = when (theme) {
@@ -139,67 +176,93 @@ class MainActivity : FragmentActivity() {
                 else -> isSystemInDarkTheme()
             }
             
-            val pinEnabled by settingsRepository.pinEnabledFlow.collectAsState(initial = false)
-            val biometricEnabled by settingsRepository.biometricEnabledFlow.collectAsState(initial = false)
+            val pinEnabled by settingsRepository.pinEnabledFlow.collectAsState(initial = null)
+            val biometricEnabled by settingsRepository.biometricEnabledFlow.collectAsState(initial = null)
             val savedPin by settingsRepository.pinCodeFlow.collectAsState(initial = "")
             
             var isAuthenticated by remember { mutableStateOf(false) }
-            val needsAuth = pinEnabled || biometricEnabled
             
-            LaunchedEffect(needsAuth) {
-                if (!needsAuth) isAuthenticated = true
+            // Wait for both to be loaded (not null) before deciding
+            val isLoaded = pinEnabled != null && biometricEnabled != null
+            val needsAuth = (pinEnabled == true) || (biometricEnabled == true)
+            
+            LaunchedEffect(isLoaded, needsAuth) {
+                if (isLoaded && !needsAuth) {
+                    isAuthenticated = true
+                }
+            }
+
+            val lifecycleOwner = LocalLifecycleOwner.current
+            DisposableEffect(lifecycleOwner) {
+                val observer = LifecycleEventObserver { _, event ->
+                    if (event == Lifecycle.Event.ON_STOP) {
+                        isAuthenticated = false
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(observer)
+                }
             }
 
             FireNotesTheme(darkTheme = isDarkTheme) {
-                if (!isAuthenticated && needsAuth) {
-                    com.andrefdias.dailynote.ui.screens.auth.AuthScreen(
-                        activity = this@MainActivity,
-                        pinEnabled = pinEnabled,
-                        biometricEnabled = biometricEnabled,
-                        savedPin = savedPin,
-                        onAuthenticated = { isAuthenticated = true }
-                    )
-                } else {
-                    val navController = rememberNavController()
+                val navController = rememberNavController()
+                
+                val pendingIntent by pendingWidgetAction.collectAsState()
+                LaunchedEffect(pendingIntent, isAuthenticated) {
+                    if (isAuthenticated && pendingIntent != null) {
+                        val act = pendingIntent?.action
+                        if (act == "ACTION_NOVA_OCORRENCIA") {
+                            navController.navigate(Screen.OcorrenciasNova.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                        pendingWidgetAction.value = null
+                    }
+                }
+
+                Box(modifier = Modifier.fillMaxSize()) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
                     val currentRoute = currentDestination?.route
 
-                    val activeNavItems = when {
-                        currentRoute in listOf(
-                            Screen.AgendaCalendario.route,
-                            Screen.AgendaTarefas.route,
-                            Screen.AgendaEventos.route
-                        ) -> agendaNavItems
-                    
-                        currentRoute in listOf(
-                            Screen.HistoricoMapaForca.route,
-                            Screen.HistoricoDashboard.route
-                        ) -> historicoNavItems
-                    
-                        currentRoute in listOf(
-                            Screen.MapaDia.route,
-                            Screen.EquipeServico.route,
-                            Screen.Militar.route,
-                            Screen.Viatura.route,
-                            Screen.Quartel.route
-                        ) -> mapaForcaNavItems
+                        val activeNavItems = when {
+                            currentRoute?.startsWith("efetivo") == true -> efetivoNavItems
+                            
+                            currentRoute in listOf(
+                                Screen.AgendaCalendario.route,
+                                Screen.AgendaTarefas.route,
+                                Screen.AgendaEventos.route
+                            ) -> agendaNavItems
                         
-                        currentRoute in listOf(
-                            Screen.OcorrenciasDashboard.route,
-                            Screen.OcorrenciasNova.route,
-                            Screen.OcorrenciasConsultar.route,
-                            Screen.OcorrenciasOpcoes.route,
-                            Screen.Relatorios.route
-                        ) -> ocorrenciasNavItems
-                    
-                        currentRoute in listOf(
-                            Screen.Home.route, 
-                            Screen.Settings.route
-                        ) -> mainNavItems
-                    
-                        else -> null
-                    }
+                            currentRoute in listOf(
+                                Screen.HistoricoMapaForca.route,
+                                Screen.HistoricoDashboard.route
+                            ) -> historicoNavItems
+                        
+                            currentRoute in listOf(
+                                Screen.MapaDia.route,
+                                Screen.EquipeServico.route,
+                                Screen.Militar.route,
+                                Screen.Viatura.route,
+                                Screen.Quartel.route
+                            ) -> mapaForcaNavItems
+                            
+                            currentRoute in listOf(
+                                Screen.OcorrenciasDashboard.route,
+                                Screen.OcorrenciasNova.route,
+                                Screen.OcorrenciasConsultar.route,
+                                Screen.OcorrenciasOpcoes.route,
+                                Screen.Relatorios.route
+                            ) -> ocorrenciasNavItems
+                        
+                            currentRoute in listOf(
+                                Screen.Home.route, 
+                                Screen.Settings.route
+                            ) -> mainNavItems
+                        
+                            else -> null
+                        }
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -274,7 +337,8 @@ class MainActivity : FragmentActivity() {
                                 onNavigateToNova = { navController.navigate(Screen.OcorrenciasNova.route) },
                                 onNavigateToRelatorios = { navController.navigate(Screen.Relatorios.route) },
                                 onNavigateToMapaForca = { navController.navigate(Screen.HistoricoMapaForca.route) },
-                                onNavigateToHistoricoMapa = { navController.navigate("historico_dashboard_mapa") }
+                                onNavigateToHistoricoMapa = { navController.navigate("historico_dashboard_mapa") },
+                                onNavigateToEfetivo = { navController.navigate(Screen.EfetivoDashboard.route) }
                             )
                         }
                         composable("historico_dashboard_mapa") {
@@ -367,7 +431,8 @@ class MainActivity : FragmentActivity() {
                             SettingsScreen(
                                 viewModel = settingsViewModel,
                                 onNavigateBack = { navController.popBackStack() },
-                                onNavigateToWizard = { navController.navigate(Screen.CalendarWizard.route) }
+                                onNavigateToWizard = { navController.navigate(Screen.CalendarWizard.route) },
+                                onNavigateToGoogleSync = { navController.navigate(Screen.GoogleSync.route) }
                             )
                         }
                         composable(Screen.SettingsCalendar.route) {
@@ -397,16 +462,104 @@ class MainActivity : FragmentActivity() {
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
+                        composable(Screen.EfetivoDashboard.route) {
+                            com.andrefdias.dailynote.ui.screens.efetivo.EfetivoDashboardScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToList = { navController.navigate(Screen.EfetivoList.route) }
+                            )
+                        }
+                        composable(Screen.EfetivoList.route) {
+                            com.andrefdias.dailynote.ui.screens.efetivo.EfetivoListScreen(
+                                onNavigateBack = { navController.popBackStack() },
+                                onMilitarClick = { militar ->
+                                    navController.navigate(Screen.EfetivoDetail.createRoute(militar.id))
+                                }
+                            )
+                        }
+                        composable(
+                            route = Screen.EfetivoDetail.route,
+                            arguments = listOf(androidx.navigation.navArgument("militarId") {
+                                type = androidx.navigation.NavType.StringType
+                            })
+                        ) { backStackEntry ->
+                            val militarId = backStackEntry.arguments?.getString("militarId") ?: ""
+                            com.andrefdias.dailynote.ui.screens.efetivo.EfetivoDetailScreen(
+                                militarId = militarId,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
                         composable(Screen.GoogleSync.route) {
                             GoogleSyncScreen(
                                 syncManager = googleCalendarSyncManager,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
-                        }
                     } // Fechamento do NavHost
-                } // Fechamento do else
+                } // Fechamento do Scaffold innerPadding
+
+                // Overlay Loading ou AuthScreen por cima de tudo para não destruir o NavHost
+                if (!isLoaded) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {}
+                } else if (!isAuthenticated && needsAuth) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                        com.andrefdias.dailynote.ui.screens.auth.AuthScreen(
+                            activity = this@MainActivity,
+                            pinEnabled = pinEnabled == true,
+                            biometricEnabled = biometricEnabled == true,
+                            savedPin = savedPin,
+                            onAuthenticated = { isAuthenticated = true }
+                        )
+                    }
+                }
+                } // Fechamento do Box
             } // Fechamento do FireNotesTheme
         } // Fechamento do setContent
+    }
+    
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
+    }
+
+    private fun handleIncomingIntent(intent: android.content.Intent?) {
+        if (intent == null) return
+        val action = intent.action
+        val type = intent.type
+
+        val uri: android.net.Uri? = when (action) {
+            "ACTION_NOVA_OCORRENCIA" -> {
+                pendingWidgetAction.value = intent
+                null
+            }
+            android.content.Intent.ACTION_SEND -> {
+                if (type == "application/json" || type == "*/*") {
+                    intent.getParcelableExtra(android.content.Intent.EXTRA_STREAM) as? android.net.Uri
+                } else null
+            }
+            android.content.Intent.ACTION_VIEW -> {
+                intent.data
+            }
+            else -> null
+        }
+
+        uri?.let { inputUri: android.net.Uri ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    contentResolver.openInputStream(inputUri)?.bufferedReader()?.use { reader ->
+                        val jsonStr = reader.readText()
+                        com.andrefdias.dailynote.util.JsonImportHelper.importOccurrenceFromJson(
+                            context = this@MainActivity, 
+                            jsonStr = jsonStr, 
+                            repository = ocorrenciaRepository
+                        )
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        android.widget.Toast.makeText(this@MainActivity, "Erro ao ler arquivo recebido: ${e.localizedMessage}", android.widget.Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
     }
 }

@@ -174,6 +174,32 @@ fun AgendaCalendarioScreen(
                 }
             }
 
+            // Filtro de Origem
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(EventSourceFilter.values()) { filterOption ->
+                    val isSelected = state.eventSourceFilter == filterOption
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (isSelected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable { viewModel.setEventSourceFilter(filterOption) }
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = filterOption.label,
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // Tabs Row
             Row(
                 modifier = Modifier
@@ -659,15 +685,29 @@ fun CalendarPremiumCell(
 
             // Events List in Cell
             Column(modifier = Modifier.padding(2.dp).fillMaxWidth()) {
-                val allItems = (eventosHoje.map { it.titulo } + tarefasHoje.map { it.titulo }).take(3)
-                allItems.forEach { title ->
-                    Text(
-                        text = "• $title",
-                        fontSize = 9.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                val itemsToShow = (eventosHoje + tarefasHoje).take(3)
+                itemsToShow.forEach { item ->
+                    val colorHex = when(item) {
+                        is com.andrefdias.dailynote.domain.model.CalendarEvento -> item.cor
+                        is com.andrefdias.dailynote.domain.model.CalendarTarefa -> item.cor
+                        else -> "#9C27B0"
+                    }
+                    val title = when(item) {
+                        is com.andrefdias.dailynote.domain.model.CalendarEvento -> item.titulo
+                        is com.andrefdias.dailynote.domain.model.CalendarTarefa -> item.titulo
+                        else -> ""
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp)) {
+                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(parseHexColor(colorHex ?: "#9C27B0", Color(0xFF9C27B0))))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = title,
+                            fontSize = 9.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }

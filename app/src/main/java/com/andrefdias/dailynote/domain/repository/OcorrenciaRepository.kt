@@ -18,6 +18,12 @@ interface OcorrenciaRepository {
     suspend fun createOcorrenciaLocal(ocorrencia: com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia)
     suspend fun updateOcorrenciaLocal(ocorrencia: com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia)
     suspend fun deleteOcorrenciaLocal(ocorrencia: com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia)
+    suspend fun getOcorrenciaById(talao: String): com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia?
+    suspend fun insertOcorrenciaComDetalhes(
+        ocorrencia: com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia,
+        pacientes: List<com.andrefdias.dailynote.data.local.entities.RoomNovaVitima>,
+        veiculos: List<com.andrefdias.dailynote.data.local.entities.RoomNovoVeiculo>
+    )
     fun getAllLocalOcorrenciasFlow(): kotlinx.coroutines.flow.Flow<List<com.andrefdias.dailynote.data.local.entities.RoomNovaOcorrencia>>
     fun getAllLegacyOcorrenciasFlow(): kotlinx.coroutines.flow.Flow<List<com.andrefdias.dailynote.data.local.entities.RoomOcorrencia>>
     

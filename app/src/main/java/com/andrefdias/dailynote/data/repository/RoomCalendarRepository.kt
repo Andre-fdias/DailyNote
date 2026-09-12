@@ -204,7 +204,8 @@ class RoomCalendarRepository @Inject constructor(
                 cor = evento.cor,
                 recorrencia = evento.recorrencia.name,
                 lembreteMinutos = evento.lembreteMinutos,
-                escalaId = evento.escalaId
+                escalaId = evento.escalaId,
+                googleEventId = evento.googleEventId
             )
         )
     }
@@ -226,7 +227,8 @@ class RoomCalendarRepository @Inject constructor(
                 cor = it.cor,
                 recorrencia = runCatching { RecorrenciaTipo.valueOf(it.recorrencia) }.getOrDefault(RecorrenciaTipo.NUNCA),
                 lembreteMinutos = it.lembreteMinutos,
-                escalaId = it.escalaId
+                escalaId = it.escalaId,
+                googleEventId = it.googleEventId
             )
         }
     }
@@ -244,7 +246,9 @@ class RoomCalendarRepository @Inject constructor(
                     categoria = runCatching { CategoriaEvento.valueOf(it.categoria) }.getOrDefault(CategoriaEvento.PERSONALIZADO),
                     cor = it.cor,
                     recorrencia = runCatching { RecorrenciaTipo.valueOf(it.recorrencia) }.getOrDefault(RecorrenciaTipo.NUNCA),
-                    lembreteMinutos = it.lembreteMinutos
+                    lembreteMinutos = it.lembreteMinutos,
+                    escalaId = it.escalaId,
+                    googleEventId = it.googleEventId
                 )
             }
         }
@@ -263,7 +267,8 @@ class RoomCalendarRepository @Inject constructor(
                 cor = it.cor,
                 recorrencia = runCatching { RecorrenciaTipo.valueOf(it.recorrencia) }.getOrDefault(RecorrenciaTipo.NUNCA),
                 lembreteMinutos = it.lembreteMinutos,
-                escalaId = it.escalaId
+                escalaId = it.escalaId,
+                googleEventId = it.googleEventId
             )
         }
     }
@@ -281,7 +286,9 @@ class RoomCalendarRepository @Inject constructor(
                     categoria = runCatching { CategoriaEvento.valueOf(it.categoria) }.getOrDefault(CategoriaEvento.PERSONALIZADO),
                     cor = it.cor,
                     recorrencia = runCatching { RecorrenciaTipo.valueOf(it.recorrencia) }.getOrDefault(RecorrenciaTipo.NUNCA),
-                    lembreteMinutos = it.lembreteMinutos
+                    lembreteMinutos = it.lembreteMinutos,
+                    escalaId = it.escalaId,
+                    googleEventId = it.googleEventId
                 )
             }
         }
@@ -300,7 +307,8 @@ class RoomCalendarRepository @Inject constructor(
                 cor = it.cor,
                 recorrencia = runCatching { RecorrenciaTipo.valueOf(it.recorrencia) }.getOrDefault(RecorrenciaTipo.NUNCA),
                 lembreteMinutos = it.lembreteMinutos,
-                escalaId = it.escalaId
+                escalaId = it.escalaId,
+                googleEventId = it.googleEventId
             )
         }
     }

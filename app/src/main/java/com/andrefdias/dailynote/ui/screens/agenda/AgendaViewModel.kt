@@ -20,6 +20,16 @@ import java.time.format.DateTimeFormatter
 import com.andrefdias.dailynote.domain.model.EquipeConfig
 import com.andrefdias.dailynote.domain.model.EscalaConfig
 import com.andrefdias.dailynote.domain.calendar.ScaleEngine
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import com.andrefdias.dailynote.domain.calendar.NotificationScheduler
+
+enum class EventSourceFilter(val label: String) {
+    ALL("Ambas as Agendas"),
+    DAILY_NOTES("Somente Fire Notes"),
+    GOOGLE("Somente Google"),
+    NONE("Ocultar Tudo")
+}
 
 data class AgendaState(
     val selectedDate: LocalDate = LocalDate.now(),
@@ -30,13 +40,15 @@ data class AgendaState(
     val equipes: List<EquipeConfig> = emptyList(),
     val escalas: List<EscalaConfig> = emptyList(),
     val escalasPorDia: Map<LocalDate, Map<Int, List<EquipeConfig>>> = emptyMap(),
-    val selectedEscalaFilter: String? = null
+    val selectedEscalaFilter: String? = null,
+    val eventSourceFilter: EventSourceFilter = EventSourceFilter.ALL
 )
 
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val repository: CalendarRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AgendaState())
@@ -58,6 +70,11 @@ class AgendaViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.setActiveCalendarFilter(filter ?: "Todos")
         }
+    }
+
+    fun setEventSourceFilter(filter: EventSourceFilter) {
+        _state.value = _state.value.copy(eventSourceFilter = filter)
+        loadAllData()
     }
 
     fun selectDate(date: LocalDate) {
@@ -105,13 +122,27 @@ class AgendaViewModel @Inject constructor(
                 val allEscalas = args[3] as List<EscalaConfig>
                 val filter = args[4] as String?
 
-                val filteredEventos = if (filter == null) allEventos else allEventos.filter { it.escalaId == null || it.escalaId == filter }
-                val filteredTarefas = if (filter == null) allTarefas else allTarefas.filter { it.escalaId == null || it.escalaId == filter }
+                val baseEventos = if (filter == null) allEventos else allEventos.filter { it.escalaId == null || it.escalaId == filter }
+                val baseTarefas = if (filter == null) allTarefas else allTarefas.filter { it.escalaId == null || it.escalaId == filter }
                 val filteredEquipes = if (filter == null) allEquipes else allEquipes.filter { it.escalaId == filter }
 
+                val sourceFilter = _state.value.eventSourceFilter
+                
+                val finalEventos = when (sourceFilter) {
+                    EventSourceFilter.ALL -> baseEventos
+                    EventSourceFilter.DAILY_NOTES -> baseEventos.filter { it.googleEventId == null }
+                    EventSourceFilter.GOOGLE -> baseEventos.filter { it.googleEventId != null }
+                    EventSourceFilter.NONE -> emptyList()
+                }
+                
+                val finalTarefas = when (sourceFilter) {
+                    EventSourceFilter.ALL, EventSourceFilter.DAILY_NOTES -> baseTarefas
+                    EventSourceFilter.GOOGLE, EventSourceFilter.NONE -> emptyList()
+                }
+
                 _state.value.copy(
-                    todosEventos = filteredEventos,
-                    todasTarefas = filteredTarefas,
+                    todosEventos = finalEventos,
+                    todasTarefas = finalTarefas,
                     equipes = filteredEquipes,
                     escalas = allEscalas
                 )
@@ -146,10 +177,12 @@ class AgendaViewModel @Inject constructor(
                 categoria = com.andrefdias.dailynote.domain.model.CategoriaEvento.PERSONALIZADO,
                 cor = cor,
                 recorrencia = com.andrefdias.dailynote.domain.model.RecorrenciaTipo.NUNCA,
-                lembreteMinutos = 15,
+                lembreteMinutos = 60,
                 escalaId = escalaId
             )
             repository.saveEvento(eventoToSave)
+            // Agenda 3 lembretes: 1 dia antes, 1 hora antes, e no horário exato
+            NotificationScheduler.scheduleForEvento(context, eventoToSave)
         }
     }
 
@@ -170,17 +203,21 @@ class AgendaViewModel @Inject constructor(
                 checklist = checklist
             )
             repository.saveTarefa(tarefaToSave)
+            // Agenda 3 lembretes: 1 dia antes, 1 hora antes, e no horário exato
+            NotificationScheduler.scheduleForTarefa(context, tarefaToSave)
         }
     }
 
     fun deleteTarefa(tarefa: CalendarTarefa) {
         viewModelScope.launch {
+            NotificationScheduler.cancelRemindersFor(context, tarefa.id)
             repository.deleteTarefa(tarefa.id)
         }
     }
     
     fun deleteEvento(evento: CalendarEvento) {
         viewModelScope.launch {
+            NotificationScheduler.cancelRemindersFor(context, evento.id)
             repository.deleteEvento(evento.id)
         }
     }

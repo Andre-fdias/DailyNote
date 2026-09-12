@@ -36,6 +36,13 @@ sealed class Screen(
     
     object ResumoOperacional : Screen("resumo_operacional", "Resumo Operacional", Icons.Outlined.Description, Icons.Filled.Description, false)
 
+    // --- EFETIVO CONTEXT ---
+    object EfetivoDashboard : Screen("efetivo_dashboard", "Dashboard Efetivo", Icons.Outlined.Dashboard, Icons.Filled.Dashboard, true)
+    object EfetivoList : Screen("efetivo_list", "Lista de Militares", Icons.Outlined.People, Icons.Filled.People, false)
+    object EfetivoDetail : Screen("efetivo_detail/{militarId}", "Detalhes do Militar", Icons.Outlined.Person, Icons.Filled.Person, false) {
+        fun createRoute(id: String) = "efetivo_detail/$id"
+    }
+
     // --- OCORRENCIAS CONTEXT ---
     object OcorrenciasDashboard : Screen("ocorrencias_dashboard", "Dashboard", Icons.Outlined.Dashboard, Icons.Filled.Dashboard, true)
     object OcorrenciasNova : Screen("ocorrencias_nova", "Nova Ocorrência", Icons.Outlined.AddCircle, Icons.Filled.AddCircle, true)

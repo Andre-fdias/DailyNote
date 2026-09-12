@@ -436,8 +436,8 @@ fun ImageEditorScreen(
                             modifier = Modifier
                                 .clickable {
                                     if (allPaths.isNotEmpty() || allTexts.isNotEmpty()) {
-                                        if (allPaths.isNotEmpty()) allPaths.removeLast()
-                                        else if (allTexts.isNotEmpty()) allTexts.removeLast()
+                                        if (allPaths.isNotEmpty()) allPaths.removeAt(allPaths.lastIndex)
+                                        else if (allTexts.isNotEmpty()) allTexts.removeAt(allTexts.lastIndex)
                                         triggerUpdate = !triggerUpdate
                                     }
                                 }

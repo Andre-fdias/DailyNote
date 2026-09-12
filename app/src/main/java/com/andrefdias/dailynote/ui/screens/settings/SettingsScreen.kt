@@ -39,7 +39,8 @@ import kotlinx.coroutines.delay
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToWizard: () -> Unit
+    onNavigateToWizard: () -> Unit,
+    onNavigateToGoogleSync: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -164,7 +165,7 @@ fun SettingsScreen(
                             else viewModel.updatePinErrorAndShowDialog() // Mostra diálogo de PIN
                         },
                         onBiometricEnabledChange = viewModel::updateBiometric,
-                        pinCode = uiState.pinCode,
+                        pinCode = uiState.pinInputValue,
                         pinConfirmValue = uiState.pinConfirmValue ?: "",
                         pinError = uiState.pinError ?: "",
                         onPinChange = viewModel::updatePinCode,
@@ -188,7 +189,8 @@ fun SettingsScreen(
                         onBackupClick = viewModel::performDriveBackup,
                         onRestoreClick = viewModel::fetchDriveBackups,
                         onFrequencyChange = viewModel::updateBackupFrequency,
-                        onWifiOnlyChange = viewModel::updateBackupWifiOnly
+                        onWifiOnlyChange = viewModel::updateBackupWifiOnly,
+                        onNavigateToGoogleSync = onNavigateToGoogleSync
                     )
                     3 -> LogsTab(
                         logLevel = uiState.logLevel,
@@ -397,7 +399,8 @@ private fun BackupTab(
     onBackupClick: () -> Unit,
     onRestoreClick: () -> Unit,
     onFrequencyChange: (String) -> Unit,
-    onWifiOnlyChange: (Boolean) -> Unit
+    onWifiOnlyChange: (Boolean) -> Unit,
+    onNavigateToGoogleSync: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -478,6 +481,31 @@ private fun BackupTab(
                 ) {
                     Icon(Icons.Default.CloudQueue, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                     Text("Conectar ao Google Drive")
+                }
+            }
+        }
+
+        PreferenceCard(
+            title = "Google Agenda",
+            subtitle = "Sincronize seus compromissos e tarefas"
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Acesse a área de sincronização da Google Agenda para unificar seus eventos com o aplicativo.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Button(
+                    onClick = onNavigateToGoogleSync,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Event,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Configurar Sincronização da Agenda")
                 }
             }
         }

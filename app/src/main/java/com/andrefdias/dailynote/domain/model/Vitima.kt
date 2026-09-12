@@ -15,6 +15,7 @@ enum class RegiaoCorporal(val label: String, val emoji: String) {
     MEMBRO_SUP_ESQUERDO("M.S. Esquerdo", "💪"),
     MEMBRO_INF_DIREITO("M.I. Direito", "🦵"),
     MEMBRO_INF_ESQUERDO("M.I. Esquerdo", "🦵"),
+    GENITALIA("Genitália", "👖")
 }
 
 enum class TipoFerimento(val label: String) {
@@ -30,6 +31,7 @@ enum class TipoFerimento(val label: String) {
 data class Lesao(
     val regiao: RegiaoCorporal,
     val tipo: TipoFerimento,
+    val percentualQueimadura: Double? = null // Usado apenas quando tipo == QUEIMADURA
 )
 
 // ============================================

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.andrefdias.dailynote.domain.calendar.ScaleEngine
 import com.andrefdias.dailynote.domain.calendar.NotificationCenter
+import com.andrefdias.dailynote.domain.calendar.GoogleCalendarSyncManager
 import com.andrefdias.dailynote.domain.model.*
 import com.andrefdias.dailynote.domain.repository.CalendarRepository
 import com.andrefdias.dailynote.domain.repository.SettingsRepository
@@ -43,6 +44,7 @@ enum class CalendarViewType {
 class CalendarViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
     private val settingsRepository: SettingsRepository,
+    private val googleCalendarSyncManager: GoogleCalendarSyncManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -56,6 +58,20 @@ class CalendarViewModel @Inject constructor(
             settingsRepository.activeCalendarFilterFlow.collect { filter ->
                 val activeFilter = if (filter == "Todos") null else filter
                 _uiState.update { it.copy(selectedEscalaFilter = activeFilter) }
+            }
+        }
+        syncGoogleCalendar()
+    }
+
+    fun syncGoogleCalendar() {
+        viewModelScope.launch {
+            val account = googleCalendarSyncManager.getLastSignedInAccount()
+            if (account != null) {
+                val tokenResult = googleCalendarSyncManager.connectAccount(account)
+                if (tokenResult.isSuccess) {
+                    val token = tokenResult.getOrThrow()
+                    googleCalendarSyncManager.syncEvents(token)
+                }
             }
         }
     }
@@ -223,14 +239,16 @@ class CalendarViewModel @Inject constructor(
                     .toInstant()
                     .toEpochMilli() - (lembreteMinutos * 60 * 1000)
                 
-                NotificationCenter.scheduleReminder(
-                    context = context,
-                    id = id,
-                    titulo = titulo,
-                    descricao = descricao,
-                    timeInMillis = triggerTime,
-                    categoria = CategoriaNotificacao.EVENTOS
-                )
+                if (triggerTime > System.currentTimeMillis()) {
+                    NotificationCenter.scheduleReminder(
+                        context = context,
+                        id = id,
+                        titulo = titulo,
+                        descricao = descricao,
+                        timeInMillis = triggerTime,
+                        categoria = CategoriaNotificacao.EVENTOS
+                    )
+                }
             }
 
             NotificationCenter.dispatchNotification(
@@ -282,14 +300,16 @@ class CalendarViewModel @Inject constructor(
                 .toInstant()
                 .toEpochMilli()
             
-            NotificationCenter.scheduleReminder(
-                context = context,
-                id = id,
-                titulo = "Tarefa Pendente: $titulo",
-                descricao = descricao,
-                timeInMillis = triggerTime,
-                categoria = CategoriaNotificacao.TAREFAS
-            )
+            if (triggerTime > System.currentTimeMillis()) {
+                NotificationCenter.scheduleReminder(
+                    context = context,
+                    id = id,
+                    titulo = "Tarefa Pendente: $titulo",
+                    descricao = descricao,
+                    timeInMillis = triggerTime,
+                    categoria = CategoriaNotificacao.TAREFAS
+                )
+            }
 
             NotificationCenter.dispatchNotification(
                 context = context,
